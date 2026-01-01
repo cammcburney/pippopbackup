@@ -35,6 +35,7 @@ class PIPPOP_API UCustomisationManager : public UUserWidget
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<USwitchMenuItem> SwitchMenuItemClass;
+	
 public:
 
 	virtual void Init();

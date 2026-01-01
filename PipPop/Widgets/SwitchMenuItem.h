@@ -55,7 +55,9 @@ public:
 
 	void SetManager(UCustomisationManager* NewManager) {Owner = NewManager;}
 
-	void SetItemName(const EAppearance Category) const {if (ItemName) {ItemName->SetText(FText::AsCultureInvariant(UEnum::GetValueAsString(Category)));}}
+	void SetItemNameByCategory(const EAppearance Category) const {if (ItemName) {ItemName->SetText(FText::AsCultureInvariant(UEnum::GetValueAsString(Category)));}}
+
+	void SetItemName(const FName NewName) const {ItemName->SetText(FText::FromName(NewName));}
 	
 private:
 	

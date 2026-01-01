@@ -30,7 +30,9 @@ void UCustomisationManager::Init()
 				Panel->AddChild(SwitchMenu);
 				SwitchMenu->SetSection(Appearance->GetSectionName(AppearancePair.Key));
 				SwitchMenu->SetAppearanceReference(AppearancePair.Value);
-				SwitchMenu->SetItemName(AppearancePair.Key);
+				const FName Key = Appearance->GetSectionName(AppearancePair.Key);
+				const FName ItemName = AppearanceSubsystem->GetSectionName(Key);
+				SwitchMenu->SetItemName(ItemName);
 				SwitchMenu->SetManager(this);
 			}
 		}

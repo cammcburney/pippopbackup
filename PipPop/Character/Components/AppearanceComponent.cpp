@@ -37,14 +37,14 @@ void UAppearanceComponent::BeginPlay()
 	if (!AppearanceSubsystem) {return;}
 	for (const auto& AppearanceElem : AppearanceComponents)
 	{
-		if (USkeletalMesh* AppearanceItem = AppearanceSubsystem->LoadAppearanceItem(GetSectionName(AppearanceElem.Key), 0))
+		const FName SectionName = GetSectionName(AppearanceElem.Key);
+		if (USkeletalMesh* AppearanceItem = AppearanceSubsystem->LoadAppearanceAsset(SectionName, 0, &FAppearanceInfo::Mesh))
 		{
 			AppearanceElem.Value->SetSkeletalMesh(AppearanceItem);
 			AppearanceElem.Value->SetupAttachment(GetOwner()->GetRootComponent());
 			AppearanceElem.Value->RegisterComponent();
-			if (UMaterialInterface* MaterialItem = AppearanceSubsystem->LoadAppearanceMaterial(FName(*FString::FromInt(static_cast<int32>(AppearanceElem.Key))), 0))
+			if (UMaterialInterface* MaterialItem = AppearanceSubsystem->LoadAppearanceAsset(SectionName, 0, &FAppearanceInfo::Material))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("LOaded Material"));
 				AppearanceElem.Value->SetMaterial(0, MaterialItem);
 			}
 		}
