@@ -25,7 +25,10 @@ class PIPPOP_API UCustomisationManager : public UUserWidget
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 
 	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UVerticalBox> Panel;
+	TObjectPtr<UVerticalBox> MeshPanel;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UVerticalBox> MaterialPanel;
 	
 	UPROPERTY()
 	TObjectPtr<UAppearanceSubsystem> AppearanceSubsystem;

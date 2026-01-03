@@ -25,15 +25,27 @@ void UCustomisationManager::Init()
 		for (const TPair AppearancePair : AppearanceMap)
 		{
 			if (!SwitchMenuItemClass) {return;}
-			if (USwitchMenuItem* SwitchMenu = CreateWidget<USwitchMenuItem>(this, SwitchMenuItemClass))
+			if (USwitchMenuItem* MeshMenu = CreateWidget<USwitchMenuItem>(this, SwitchMenuItemClass))
 			{
-				Panel->AddChild(SwitchMenu);
-				SwitchMenu->SetSection(Appearance->GetSectionName(AppearancePair.Key));
-				SwitchMenu->SetAppearanceReference(AppearancePair.Value);
+				MeshPanel->AddChild(MeshMenu);
+				MeshMenu->SetType(EAppearanceType::Material);
+				MeshMenu->SetSection(Appearance->GetSectionName(AppearancePair.Key));
+				MeshMenu->SetAppearanceReference(AppearancePair.Value);
 				const FName Key = Appearance->GetSectionName(AppearancePair.Key);
 				const FName ItemName = AppearanceSubsystem->GetSectionName(Key);
-				SwitchMenu->SetItemName(ItemName);
-				SwitchMenu->SetManager(this);
+				MeshMenu->SetItemName(ItemName);
+				MeshMenu->SetManager(this);
+			}
+			if (USwitchMenuItem* MaterialMenu = CreateWidget<USwitchMenuItem>(this, SwitchMenuItemClass))
+			{
+				MaterialPanel->AddChild(MaterialMenu);
+				MaterialMenu->SetType(EAppearanceType::Material);
+				MaterialMenu->SetSection(Appearance->GetSectionName(AppearancePair.Key));
+				MaterialMenu->SetAppearanceReference(AppearancePair.Value);
+				const FName Key = Appearance->GetSectionName(AppearancePair.Key);
+				const FName ItemName = AppearanceSubsystem->GetSectionName(Key);
+				MaterialMenu->SetItemName(ItemName);
+				MaterialMenu->SetManager(this);
 			}
 		}
 	}
