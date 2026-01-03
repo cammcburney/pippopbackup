@@ -13,24 +13,48 @@ void USwitchMenuItem::NativeConstruct()
 
 void USwitchMenuItem::NextItem(const int32 Iteration)
 {
-	if (Owner && !AppearanceSection.IsNone() && SkeletalMeshComponent)
+	if (Owner && !AppearanceSubsystem)
 	{
-		UAppearanceSubsystem* Subsystem = Owner->GetAppearanceSubsystem();
-		int32 NextIndex = Index + Iteration;
-		const int32 MaxIndex = Subsystem->GetSectionLength(AppearanceSection);
-		if (NextIndex < 0)
-		{
-			NextIndex = MaxIndex - 1;
-		}
-		else if (NextIndex >= MaxIndex - 1)
-		{
-			NextIndex = 0;
-		}
-		Index = NextIndex;
-		USkeletalMesh* Item = Subsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Mesh);
-		SkeletalMeshComponent->SetSkeletalMesh(Item);
+		AppearanceSubsystem = Owner->GetAppearanceSubsystem();
+	}
+	if (!AppearanceSection.IsNone() && SkeletalMeshComponent && AppearanceSubsystem)
+	{
+		const int32 NextIndex = Index + Iteration;
+		const int32 MaxIndex = AppearanceSubsystem->GetSectionLength(AppearanceSection, AppearanceType);
+		Index = GetNextValidIndex(NextIndex, MaxIndex);
+		SelectAssetAction();
 	}
 }
 
+int32 USwitchMenuItem::GetNextValidIndex(const int32 NextIndex, const int32 MaxIndex)
+{
+	if (NextIndex < 0)
+	{
+		return MaxIndex - 1;
+	}
+	if (NextIndex >= MaxIndex)
+	{
+		return 0;
+	}
+	return NextIndex;
+}
 
-
+void USwitchMenuItem::SelectAssetAction()
+{
+	if (!AppearanceSubsystem) {return;}
+	switch (AppearanceType)
+	{
+	case EAppearanceType::Mesh:
+		{
+			USkeletalMesh* Mesh = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Mesh);
+			SkeletalMeshComponent->SetSkeletalMesh(Mesh);
+			break;
+		}
+	case EAppearanceType::Material:
+		{
+			UMaterialInterface* Material = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Material);
+			SkeletalMeshComponent->SetMaterial(0, Material);
+			break;
+		}
+	}
+}

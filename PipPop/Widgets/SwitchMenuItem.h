@@ -7,21 +7,28 @@
 #include "Components/TextBlock.h"
 #include "Widgets/CustomisationManager.h"
 #include "Character/Components/AppearanceComponent.h"
+#include "Data/AppearanceStructs.h"
 #include "SwitchMenuItem.generated.h"
 
 
 class UAppearanceSubsystem;
 class UButton;
 class UTextBlock;
-
+enum class EAppearanceType : uint8;
 /**
  * 
  */
+
+
 UCLASS()
 class PIPPOP_API USwitchMenuItem : public UUserWidget
 {
 	GENERATED_BODY()
-	
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EAppearanceType AppearanceType;
+
 private:
 
 	UPROPERTY(meta=(BindWidget))
@@ -38,6 +45,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UCustomisationManager> Owner;
+
+	UPROPERTY()
+	TObjectPtr<UAppearanceSubsystem> AppearanceSubsystem;
 	
 	UPROPERTY()
 	FName AppearanceSection;
@@ -49,9 +59,11 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void SetSection(const FName NewSection) {AppearanceSection = NewSection; GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("ADD SECTION")));}
+	void SetType(const EAppearanceType NewAppearanceType) {AppearanceType = NewAppearanceType;}
+	
+	void SetSection(const FName NewSection) {AppearanceSection = NewSection;}
 
-	void SetAppearanceReference(USkeletalMeshComponent* NewSkelMeshComp) {SkeletalMeshComponent = NewSkelMeshComp;GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("ADD SEKELTALSECTION")));}
+	void SetAppearanceReference(USkeletalMeshComponent* NewSkelMeshComp) {SkeletalMeshComponent = NewSkelMeshComp;}
 
 	void SetManager(UCustomisationManager* NewManager) {Owner = NewManager;}
 
@@ -59,13 +71,17 @@ public:
 
 	void SetItemName(const FName NewName) const {ItemName->SetText(FText::FromName(NewName));}
 	
+	void SelectAssetAction();
+	
+	static int32 GetNextValidIndex(const int32 NextIndex, const int32 MaxIndex);
+
 private:
 	
 	UFUNCTION()
-	void OnLeftClick() {NextItem(1);};
+	void OnLeftClick() {NextItem(-1);};
 
 	UFUNCTION()
-	void OnRightClick() {NextItem(-1);}
+	void OnRightClick() {NextItem(1);}
 	
 	void NextItem(const int32 Iteration);
 	
