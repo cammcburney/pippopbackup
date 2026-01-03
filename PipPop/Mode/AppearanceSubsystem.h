@@ -9,6 +9,13 @@
 
 class UPipPopGameInstance;
 
+UENUM(BlueprintType)
+enum class EAppearanceType: uint8
+{
+	Mesh,
+	Material
+};
+
 /**
  * 
  */
@@ -27,7 +34,7 @@ public:
 	
 	UAppearanceSubsystem();
 
-	int32 GetSectionLength(FName RowName) const;
+	int32 GetSectionLength(FName RowName, EAppearanceType AppearanceType) const;
 
 	FName GetSectionName(FName RowName) const;
 	

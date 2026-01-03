@@ -19,11 +19,21 @@ void UAppearanceSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	check(AppearanceTable)
 }
 
-int32 UAppearanceSubsystem::GetSectionLength(const FName RowName) const
+int32 UAppearanceSubsystem::GetSectionLength(const FName RowName, EAppearanceType AppearanceType) const
 {
 	if (const FAppearanceInfo* AppearanceRow = AppearanceTable->FindRow<FAppearanceInfo>(RowName, ""))
 	{
-		return AppearanceRow->Mesh.Num();
+		switch (AppearanceType)
+		{
+		case EAppearanceType::Mesh:
+			{
+				return AppearanceRow->Mesh.Num();
+			}
+		case EAppearanceType::Material:
+			{
+				return AppearanceRow->Material.Num();
+			}
+		}
 	}
 	return 0;
 }
