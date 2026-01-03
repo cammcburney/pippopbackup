@@ -28,7 +28,7 @@ void UCustomisationManager::Init()
 			if (USwitchMenuItem* MeshMenu = CreateWidget<USwitchMenuItem>(this, SwitchMenuItemClass))
 			{
 				MeshPanel->AddChild(MeshMenu);
-				MeshMenu->SetType(EAppearanceType::Material);
+				MeshMenu->SetType(EAppearanceType::Mesh);
 				MeshMenu->SetSection(Appearance->GetSectionName(AppearancePair.Key));
 				MeshMenu->SetAppearanceReference(AppearancePair.Value);
 				const FName Key = Appearance->GetSectionName(AppearancePair.Key);
