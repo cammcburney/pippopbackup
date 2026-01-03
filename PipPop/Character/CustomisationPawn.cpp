@@ -33,7 +33,6 @@ void ACustomisationPawn::BeginPlay()
 	Super::BeginPlay();
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, TEXT("Set view target"));
 		PC->SetViewTargetWithBlend(this);
 	}
 }
