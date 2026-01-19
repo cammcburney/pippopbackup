@@ -4,17 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "InputActionValue.h"
 #include "CustomisationPawn.generated.h"
 
 class UAppearanceComponent;
 class UCameraComponent;
 class USpringArmComponent;
+class UEnhancedInputComponent;
+class UInputAction;
+class UInputMappingContext;
+
+USTRUCT()
+struct FInputActions
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputAction> ClickAction;
+	
+};
 
 UCLASS()
 class PIPPOP_API ACustomisationPawn : public APawn
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly)
+	FInputActions InputActions;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UInputMappingContext> InputMappingContext;
+	
 	UPROPERTY()
 	TObjectPtr<UAppearanceComponent> AppearanceComponent;
 
@@ -28,6 +48,9 @@ public:
 	// Sets default values for this pawn's properties
 	ACustomisationPawn();
 
+	UFUNCTION()
+	void OnLeftClick(const FInputActionValue& Value);
+	
 	UAppearanceComponent* GetAppearance() const {return AppearanceComponent;}
 
 protected:
