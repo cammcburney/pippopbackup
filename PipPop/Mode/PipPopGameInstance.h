@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Data/Save/PipPopSaveGame.h"
 #include "PipPopGameInstance.generated.h"
 
 /**
@@ -13,10 +14,22 @@ UCLASS()
 class PIPPOP_API UPipPopGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
+	UPROPERTY()
+	FString SaveName = "Default";
+
+	UPROPERTY()
+	TObjectPtr<UPipPopSaveGame> SavedGame;
 	
 public:
+
+	UPipPopGameInstance();
 	
 	TObjectPtr<UDataTable> GetAppearanceTable() const {return AppearanceTable;} 
+
+	void SaveCharacterCustomisation(TArray<int32> MeshIndexes);
+
+	void LoadGame();
 	
 private:
 	

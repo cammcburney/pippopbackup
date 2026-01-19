@@ -17,7 +17,8 @@ public class PipPop : ModuleRules
 			"AIModule",
 			"StateTreeModule",
 			"GameplayStateTreeModule",
-			"UMG"
+			"UMG",
+			"Text3D"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
