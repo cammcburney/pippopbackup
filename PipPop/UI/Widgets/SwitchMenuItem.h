@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
-#include "Widgets/CustomisationManager.h"
+#include "UI/Widgets/CustomisationManager.h"
 #include "Character/Components/AppearanceComponent.h"
 #include "Data/AppearanceStructs.h"
 #include "SwitchMenuItem.generated.h"
@@ -70,6 +70,8 @@ public:
 	void SetItemNameByCategory(const EAppearance Category) const {if (ItemName) {ItemName->SetText(FText::AsCultureInvariant(UEnum::GetValueAsString(Category)));}}
 
 	void SetItemName(const FName NewName) const {ItemName->SetText(FText::FromName(NewName));}
+
+	int32 GetIndex() const {return Index;}
 	
 	void SelectAssetAction();
 	

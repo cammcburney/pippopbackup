@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "InputActionValue.h"
+#include "Camera/CameraComponent.h"
+#include "Components/WidgetInteractionComponent.h"
 #include "MenuPawn.generated.h"
 
 class UCameraComponent;
@@ -39,6 +41,9 @@ class PIPPOP_API AMenuPawn : public APawn
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY()
+	TObjectPtr<UWidgetInteractionComponent> InteractionComponent;
 	
 public:
 
@@ -46,6 +51,10 @@ public:
 
 	UFUNCTION()
 	void OnLeftClick(const FInputActionValue& Value);
+
+	FRotator GetCameraRotation() const {if (CameraComponent) {return CameraComponent->GetRelativeRotation();} return FRotator::ZeroRotator;}
+	
+	void SetCameraRotation(const FRotator& CameraRotation) const;
 
 protected:
 

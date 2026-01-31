@@ -37,15 +37,14 @@ protected:
 	UPROPERTY()
 	TMap<EAppearance, USkeletalMeshComponent*> AppearanceComponents;
 	
-protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	USkeletalMeshComponent* GetSkeletalMeshComponent(const EAppearance Section) const {if (AppearanceComponents.Contains(Section)) {return AppearanceComponents[Section];} return nullptr;}
 	
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	static FName GetSectionName(EAppearance AppearanceEnum) {return FName(*FString::FromInt(static_cast<int32>(AppearanceEnum)));}
+
+	USkeletalMeshComponent* GetSkeletalMeshComponent(const EAppearance Section) const {if (AppearanceComponents.Contains(Section)) {return AppearanceComponents[Section];} return nullptr;}
 };

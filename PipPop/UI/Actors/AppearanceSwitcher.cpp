@@ -131,8 +131,6 @@ void AAppearanceSwitcher::SetupActor() const
 		{
 			UStaticMeshComponent* Component = StaticMeshComponents[i];
 			Component->SetStaticMesh(StaticMesh);
-			Component->SetWorldScale3D(MeshScale);
-			Component->SetWorldRotation(MeshRotation);
 			Component->SetMaterial(0, MeshMaterial);
 			Component->SetRenderCustomDepth(true);
 			Component->SetCustomDepthStencilValue(1);

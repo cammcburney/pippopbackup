@@ -58,5 +58,16 @@ void UAppearanceComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+	for (const auto& AppearanceElem : AppearanceComponents)
+	{
+		if (USkeletalMeshComponent* AppearanceItem = AppearanceElem.Value)
+		{
+			if (AppearanceItem)
+			{
+				FRotator Rotation = AppearanceElem.Value->GetComponentRotation();
+				AppearanceElem.Value->SetWorldRotation(Rotation + FRotator(0,.3f,0));
+			}
+		}
+	}
 }
 

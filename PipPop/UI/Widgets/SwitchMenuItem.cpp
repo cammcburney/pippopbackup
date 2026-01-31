@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widgets/SwitchMenuItem.h"
+#include "UI/Widgets/SwitchMenuItem.h"
 #include "Components/Button.h"
 #include "Mode/AppearanceSubsystem.h"
 

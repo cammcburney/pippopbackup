@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "UI/Widgets/SessionEntry.h"
 #include "MenuMode.generated.h"
 
+DECLARE_DELEGATE_OneParam(FCreateSessionWidget, USessionEntry*)
+
+class FOnlineSession;
 /**
  * 
  */
@@ -13,8 +17,18 @@ UCLASS()
 class PIPPOP_API AMenuMode : public AGameMode
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<USessionEntry> SessionEntryClass;
+	
+public:
+	
+	void DisplaySessionInfo(const FOnlineSessionSearchResult& FoundSession);
+
+	FCreateSessionWidget CreateSessionWidgetDelegate;
 	
 protected:
 
 	virtual void BeginPlay() override;
+	
 };

@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Widgets/CustomisationManager.h"
+#include "UI/Widgets/CustomisationManager.h"
 #include "Character/CustomisationPawn.h"
 #include "Character/Components/AppearanceComponent.h"
 #include "Mode/AppearanceSubsystem.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "Mode/PipPopGameInstance.h"
-#include "Widgets/SwitchMenuItem.h"
+#include "UI/Widgets/SwitchMenuItem.h"
 
 void UCustomisationManager::Init()
 {
@@ -35,6 +35,7 @@ void UCustomisationManager::Init()
 				const FName ItemName = AppearanceSubsystem->GetSectionName(Key);
 				MeshMenu->SetItemName(ItemName);
 				MeshMenu->SetManager(this);
+				MeshMenus.Add(MeshMenu);
 			}
 			if (USwitchMenuItem* MaterialMenu = CreateWidget<USwitchMenuItem>(this, SwitchMenuItemClass))
 			{
@@ -46,7 +47,21 @@ void UCustomisationManager::Init()
 				const FName ItemName = AppearanceSubsystem->GetSectionName(Key);
 				MaterialMenu->SetItemName(ItemName);
 				MaterialMenu->SetManager(this);
+				MaterialMenus.Add(MaterialMenu);
 			}
 		}
 	}
+}
+
+TArray<int32> UCustomisationManager::GetMeshIndexes()
+{
+	TArray<int32> Indexes;
+	for (int32 i = 0; i < MeshMenus.Num(); i++)
+	{
+		if (MeshMenus.IsValidIndex(i))
+		{
+			Indexes.Add(MeshMenus[i]->GetIndex());
+		}
+	}
+	return Indexes;
 }

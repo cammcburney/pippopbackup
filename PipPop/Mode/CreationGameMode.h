@@ -19,11 +19,4 @@ public:
 
 	virtual void BeginPlay() override;
 	
-private:
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UCustomisationManager> WidgetManagerClass;
-	
-	UPROPERTY()
-	TObjectPtr<UCustomisationManager> CustomisationManager;
 };

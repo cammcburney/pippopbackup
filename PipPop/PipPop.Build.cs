@@ -18,10 +18,16 @@ public class PipPop : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
-			"Text3D"
+			"Text3D",
+			"OnlineSubsystem",
+			"OnlineSubsystemNull",
+			"OnlineSubsystemSteam",
+			"OnlineSubsystemUtils",
+			"MediaAssets",
+			"MediaUtils"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] { "OnlineSubsystem" });
 
 		PublicIncludePaths.AddRange(new string[] {
 			"PipPop",

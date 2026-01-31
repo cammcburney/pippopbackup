@@ -27,8 +27,14 @@ class PIPPOP_API UCustomisationManager : public UUserWidget
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UVerticalBox> MeshPanel;
 
+	UPROPERTY()
+	TArray<TObjectPtr<USwitchMenuItem>> MeshMenus;
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UVerticalBox> MaterialPanel;
+
+	UPROPERTY()
+	TArray<TObjectPtr<USwitchMenuItem>> MaterialMenus;
 	
 	UPROPERTY()
 	TObjectPtr<UAppearanceSubsystem> AppearanceSubsystem;
@@ -44,5 +50,7 @@ public:
 	virtual void Init();
 
 	UFUNCTION()
-	UAppearanceSubsystem* GetAppearanceSubsystem() {return AppearanceSubsystem;};
+	UAppearanceSubsystem* GetAppearanceSubsystem() {return AppearanceSubsystem;}
+
+	TArray<int32> GetMeshIndexes();
 };

@@ -42,12 +42,6 @@ public:
 	UPROPERTY(EditInstanceOnly)
 	UMaterialInterface* MeshMaterial;
 	
-	UPROPERTY(EditInstanceOnly)
-	FRotator MeshRotation = FRotator(0, 0, 0);
-
-	UPROPERTY(EditInstanceOnly)
-	FVector MeshScale = FVector(1, 1, 1);
-	
 private:
 	
 	UPROPERTY()
