@@ -26,10 +26,13 @@ public:
 
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UText3DComponent> TextComponent;
+
+	UPROPERTY(EditInstanceOnly)
+	TObjectPtr<UFont> MenuFont;
 	
 private:
 	
-	UPROPERTY()
+	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 	
 protected:

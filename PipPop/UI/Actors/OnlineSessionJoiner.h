@@ -21,7 +21,7 @@ class PIPPOP_API AOnlineSessionJoiner : public ASwitcherBase
 
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UWidgetComponent> SessionsDisplayComponent;
-	
+
 public:	
 
 	AOnlineSessionJoiner();

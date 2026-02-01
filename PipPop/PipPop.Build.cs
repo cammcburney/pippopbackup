@@ -18,6 +18,7 @@ public class PipPop : ModuleRules
 			"StateTreeModule",
 			"GameplayStateTreeModule",
 			"UMG",
+			"SlateCore",
 			"Text3D",
 			"OnlineSubsystem",
 			"OnlineSubsystemNull",

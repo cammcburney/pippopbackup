@@ -10,12 +10,16 @@ ASwitcherBase::ASwitcherBase()
 	TextComponent = CreateDefaultSubobject<UText3DComponent>(TEXT("TextComponent"));
 	if (StaticMeshComponent)
 	{
-		RootComponent = StaticMeshComponent;
+		StaticMeshComponent->SetupAttachment(RootComponent);
 		LoadMesh();
 	}
 	if (TextComponent)
 	{
 		TextComponent->SetupAttachment(RootComponent);
+		if (MenuFont)
+		{
+			TextComponent->SetFont(MenuFont);
+		}
 	}
 }
 
