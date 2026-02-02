@@ -7,31 +7,6 @@
 #include "Components/TextBlock.h"
 #include "SessionEntry.generated.h"
 
-USTRUCT(BlueprintType)
-struct FSessionButtons
-{
-	GENERATED_BODY()
-	
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> ServerName;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> MapName;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> ModeName;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> CurrentPlayers;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> MaxPlayers;
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UTextBlock> Ping;
-	
-};
-
 UENUM(BlueprintType)
 enum class ESessionText : uint8
 {
@@ -50,9 +25,24 @@ class PIPPOP_API USessionEntry : public UUserWidget
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	FSessionButtons SessionButtons = FSessionButtons();
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> ServerName;
 
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> MapName;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> ModeName;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> CurrentPlayers;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> MaxPlayers;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Ping;
+	
 public:
 
 	UFUNCTION()

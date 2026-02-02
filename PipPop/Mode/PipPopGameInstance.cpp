@@ -48,12 +48,12 @@ void UPipPopGameInstance::HostSession(const FName& SessionName)
 			SessionSettings->bIsDedicated = false;
 			SessionSettings->NumPublicConnections = 16;
 			SessionSettings->NumPrivateConnections = 2;
-			SessionSettings->Settings.Add(TEXT("ServerName"), SessionName.ToString());
+			SessionSettings->Set(FName(TEXT("ServerName")), FOnlineSessionSetting(SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService));
 			
 			const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 			if (OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), SessionName, *SessionSettings))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Hosting"));
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Hosting Session %s"), *SessionName.ToString()));
 			}
 		}
 	}

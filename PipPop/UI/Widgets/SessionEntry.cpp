@@ -8,22 +8,22 @@ void USessionEntry::SetSessionText(const ESessionText TextType, const FText& Tex
 	switch (TextType)
 	{
 		case ESessionText::ServerName:
-			if (SessionButtons.ServerName) {SessionButtons.ServerName->SetText(Text);}
+			if (ServerName) {ServerName->SetText(Text);}
 			break;
 		case ESessionText::MapName:
-			if (SessionButtons.MapName) {SessionButtons.MapName->SetText(Text);}
+			if (MapName) {MapName->SetText(Text);}
 			break;
 		case ESessionText::CurrentPlayers:
-			if (SessionButtons.CurrentPlayers) {SessionButtons.CurrentPlayers->SetText(Text);}
+			if (CurrentPlayers) {CurrentPlayers->SetText(Text);}
 			break;
 		case ESessionText::MaxPlayers:
-			if (SessionButtons.MaxPlayers) {SessionButtons.MaxPlayers->SetText(Text);}
+			if (MaxPlayers) {MaxPlayers->SetText(Text);}
 			break;
 		case ESessionText::ModeName:
-			if (SessionButtons.ModeName) {SessionButtons.ModeName->SetText(Text);}
+			if (ModeName) {ModeName->SetText(Text);}
 			break;
 		case ESessionText::Ping:
-			if (SessionButtons.Ping) {SessionButtons.Ping->SetText(Text);}
+			if (Ping) {Ping->SetText(Text);}
 			break;
 	}
 }
