@@ -2,6 +2,28 @@
 
 
 #include "UI/Widgets/SessionEntry.h"
+#include "Mode/PipPopGameInstance.h"
+#include "Components/Button.h"
+
+void USessionEntry::NativePreConstruct()
+{
+	if (SelectButton)
+	{
+		SelectButton->OnClicked.AddDynamic(this, &USessionEntry::SelectSession);
+	}
+}
+
+void USessionEntry::SelectSession()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("USessionEntry::SelectSession"));
+	if (SelectButton && SessionSearchResult)
+	{
+		if (UPipPopGameInstance* GameInstance = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GameInstance->JoinPlayerSession(*SessionSearchResult);
+		}
+	}
+}
 
 void USessionEntry::SetSessionText(const ESessionText TextType, const FText& Text)
 {

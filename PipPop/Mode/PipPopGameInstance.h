@@ -7,6 +7,7 @@
 #include "Data/Save/PipPopSaveGame.h"
 #include "Interfaces/OnlineSessionDelegates.h"
 #include "OnlineSessionSettings.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "PipPopGameInstance.generated.h"
 
 /**
@@ -41,9 +42,37 @@ public:
 
 	void FindSessionsComplete(bool bSearchCompleted);
 
+	void JoinPlayerSession(const FOnlineSessionSearchResult& SearchResult);
+
+	void JoinPlayerSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type ResultType);
+
+	void EndSession(const FName& SessionName);
+
+	void EndSessionCompleted(const FName SessionName, bool bSessionEnded);
+
+	void DestroySession(const FName& SessionName);
+
+	void DestroySessionComplete(FName SessionName, bool bSuccess);
+	
+	bool TravelToSession(const FName SessionName);
+
+	static IOnlineSessionPtr GetSessionInterface();
+	
 	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
 
 	FDelegateHandle FindSessionsCompleteHandle;
+
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
+
+	FDelegateHandle JoinSessionCompleteDelegateHandle;
+
+	FOnEndSessionCompleteDelegate EndSessionCompleteDelegate;
+	
+	FDelegateHandle EndSessionCompleteDelegateHandle;
+	
+	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
+	
+	FDelegateHandle DestroySessionCompleteDelegateHandle;
 	
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;
 	

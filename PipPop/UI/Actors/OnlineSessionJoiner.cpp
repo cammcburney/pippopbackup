@@ -16,7 +16,7 @@ AOnlineSessionJoiner::AOnlineSessionJoiner()
 	SessionsDisplayComponent->SetupAttachment(RootComponent);
 	SessionsDisplayComponent->SetDrawSize(FVector2D(1028.0f, 248.0f));
 	SessionsDisplayComponent->SetWidgetSpace(EWidgetSpace::World);
-	// SessionsDisplayComponent->SetRelativeRotation(FRotator(0, -180.f, 0));
+	FindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &AOnlineSessionJoiner::FindSessionsComplete);
 }
 
 // Called when the game starts or when spawned
@@ -53,19 +53,40 @@ void AOnlineSessionJoiner::Tick(float DeltaTime)
 
 void AOnlineSessionJoiner::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
-	if (UPipPopGameInstance* GameInstance = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance()))
+	if (InteractedComponent != SessionsDisplayComponent)
 	{
-		GameInstance->FindSessions();
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, TEXT("Finding Sessions"));
+		if (bIsFindingSessions) {return;}
+		if (UPipPopGameInstance* GameInstance = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance()))
+		{
+			GameInstance->FindSessions();
+			bIsFindingSessions = true;
+			GameInstance->FindSessionsCompleteDelegate.BindLambda([this](bool bSuccess)
+			{
+				FindSessionsComplete(bSuccess);
+			});
+		}
 	}
 }
 
 void AOnlineSessionJoiner::AddMenuItem(USessionEntry* SessionEntry)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Trying TO Add menu Item")));
 	if (const USessionsDisplay* SessionsDisplay = Cast<USessionsDisplay>(SessionsDisplayComponent->GetWidget()))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("AddSession")));
 		SessionsDisplay->AddSession(SessionEntry);
+	}
+}
+
+void AOnlineSessionJoiner::FindSessionsComplete(bool bSuccess)
+{
+	SetIsFindingSessions(false);
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, "Clear Sessions");
+	if (bSuccess)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, "SessionsDisplay Complete");
+		if (USessionsDisplay* Display = Cast<USessionsDisplay>(SessionsDisplayComponent->GetWidget()))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, "SessionsDisplay Clearing");
+			Display->SessionList->ClearChildren();
+		}
 	}
 }

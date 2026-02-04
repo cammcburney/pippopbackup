@@ -15,13 +15,19 @@ UCLASS()
 class PIPPOP_API AOnlineSessionJoiner : public ASwitcherBase
 {
 	GENERATED_BODY()
+	
+public:
 
+	bool bIsFindingSessions = false;
+	
+private:
+	
 	UPROPERTY(EditInstanceOnly)
 	TSubclassOf<UUserWidget> SessionsDisplayClass;
 
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UWidgetComponent> SessionsDisplayComponent;
-
+	
 public:	
 
 	AOnlineSessionJoiner();
@@ -29,6 +35,12 @@ public:
 	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
 
 	void AddMenuItem(USessionEntry* SessionEntry);
+
+	void FindSessionsComplete(bool bSuccess);
+	
+	void SetIsFindingSessions(const bool bIsFinding) {bIsFindingSessions = bIsFinding;}
+	
+	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
 	
 protected:
 

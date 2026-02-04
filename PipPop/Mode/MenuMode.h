@@ -23,7 +23,7 @@ class PIPPOP_API AMenuMode : public AGameMode
 	
 public:
 	
-	void DisplaySessionInfo(const FOnlineSessionSearchResult& FoundSession);
+	void DisplaySessionInfo(FOnlineSessionSearchResult& FoundSession);
 
 	FCreateSessionWidget CreateSessionWidgetDelegate;
 	

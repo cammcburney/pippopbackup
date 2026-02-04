@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/VerticalBox.h"
+#include "Components/ScrollBox.h"
 #include "UI/Widgets/SessionEntry.h"
 #include "SessionsDisplay.generated.h"
 
-class UVerticalBox;
+class UScrollBox;
 /**
  * 
  */
@@ -16,11 +16,11 @@ UCLASS()
 class PIPPOP_API USessionsDisplay : public UUserWidget
 {
 	GENERATED_BODY()
-
-	UPROPERTY(meta=(BindWidget))
-	TObjectPtr<UVerticalBox> SessionList;
-
+	
 public:
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UScrollBox> SessionList;
 
 	virtual void NativeConstruct() override;
 

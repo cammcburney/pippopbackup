@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "SessionEntry.generated.h"
+
+class UButton;
+class UPipPopGameInstance;
 
 UENUM(BlueprintType)
 enum class ESessionText : uint8
@@ -42,10 +46,23 @@ class PIPPOP_API USessionEntry : public UUserWidget
 
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Ping;
+
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UButton> SelectButton;
+	
+	FOnlineSessionSearchResult* SessionSearchResult;
 	
 public:
 
+	virtual void NativePreConstruct() override;
+
+	void SetSessionData(FOnlineSessionSearchResult& FoundSession) {SessionSearchResult = &FoundSession;}
+	
+	UFUNCTION()
+	void SelectSession();
+	
 	UFUNCTION()
 	void SetSessionText(const ESessionText TextType, const FText& Text);
+
 	
 };

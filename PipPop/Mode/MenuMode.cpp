@@ -16,7 +16,7 @@ void AMenuMode::BeginPlay()
 	}
 }
 
-void AMenuMode::DisplaySessionInfo(const FOnlineSessionSearchResult& FoundSession)
+void AMenuMode::DisplaySessionInfo(FOnlineSessionSearchResult& FoundSession)
 {
 	USessionEntry* SessionWidget = CreateWidget<USessionEntry>(GetWorld(), SessionEntryClass);
 	const int32 TotalPlayers = FoundSession.Session.SessionSettings.NumPublicConnections + FoundSession.Session.SessionSettings.NumPrivateConnections;
@@ -33,6 +33,7 @@ void AMenuMode::DisplaySessionInfo(const FOnlineSessionSearchResult& FoundSessio
 	
 	if (SessionWidget)
 	{
+		SessionWidget->SetSessionData(FoundSession);
 		SessionWidget->SetSessionText(ESessionText::CurrentPlayers, CurrentPlayersText);
 		SessionWidget->SetSessionText(ESessionText::MaxPlayers, MaxPlayersText);
 		SessionWidget->SetSessionText(ESessionText::ServerName, ServerName);
