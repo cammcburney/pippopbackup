@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Mode/AppearanceSubsystem.h"
+#include "Mode/Subsystem/AppearanceSubsystem.h"
 #include "Character/Components/AppearanceComponent.h"
 #include "Character/Interfaces/CustomisationInterface.h"
 #include "AppearanceSwitcher.generated.h"

@@ -4,7 +4,7 @@
 #include "UI/Actors/OnlineSessionJoiner.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Widgets/SessionsDisplay.h"
-#include "Mode/MenuMode.h"
+#include "Mode/Menu/MenuMode.h"
 #include "Mode/PipPopGameInstance.h"
 
 // Sets default values

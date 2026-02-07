@@ -3,7 +3,7 @@
 
 #include "UI/Widgets/SwitchMenuItem.h"
 #include "Components/Button.h"
-#include "Mode/AppearanceSubsystem.h"
+#include "Mode/Subsystem/AppearanceSubsystem.h"
 
 void USwitchMenuItem::NativeConstruct()
 {
@@ -44,17 +44,17 @@ void USwitchMenuItem::SelectAssetAction()
 	if (!AppearanceSubsystem) {return;}
 	switch (AppearanceType)
 	{
-	case EAppearanceType::Mesh:
-		{
-			USkeletalMesh* Mesh = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Mesh);
-			SkeletalMeshComponent->SetSkeletalMesh(Mesh);
-			break;
-		}
-	case EAppearanceType::Material:
-		{
-			UMaterialInterface* Material = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Material);
-			SkeletalMeshComponent->SetMaterial(0, Material);
-			break;
-		}
+		case EAppearanceType::Mesh:
+			{
+				USkeletalMesh* Mesh = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Mesh);
+				SkeletalMeshComponent->SetSkeletalMesh(Mesh);
+				break;
+			}
+		case EAppearanceType::Material:
+			{
+				UMaterialInterface* Material = AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Material);
+				SkeletalMeshComponent->SetMaterial(0, Material);
+				break;
+			}
 	}
 }

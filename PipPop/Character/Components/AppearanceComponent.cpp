@@ -2,8 +2,7 @@
 
 
 #include "Character/Components/AppearanceComponent.h"
-
-#include "Mode/AppearanceSubsystem.h"
+#include "Mode/Subsystem/AppearanceSubsystem.h"
 #include "Mode/PipPopGameInstance.h"
 
 // Sets default values for this component's properties
@@ -13,15 +12,42 @@ UAppearanceComponent::UAppearanceComponent()
 	// off to improve performance if you don't need them.
 	
 	PrimaryComponentTick.bCanEverTick = true;
-	AppearanceComponents.Add(EAppearance::Head, CreateDefaultSubobject<USkeletalMeshComponent>("HeadMesh"));
-	AppearanceComponents.Add(EAppearance::Ears, CreateDefaultSubobject<USkeletalMeshComponent>("EarsMesh"));
-	AppearanceComponents.Add(EAppearance::LeftEye, CreateDefaultSubobject<USkeletalMeshComponent>("LeftEyeMesh"));
-	AppearanceComponents.Add(EAppearance::RightEye, CreateDefaultSubobject<USkeletalMeshComponent>("RightEyeMesh"));
-	AppearanceComponents.Add(EAppearance::Mouth, CreateDefaultSubobject<USkeletalMeshComponent>("MouthMesh"));
-	AppearanceComponents.Add(EAppearance::Torso, CreateDefaultSubobject<USkeletalMeshComponent>("TorsoMesh"));
-	AppearanceComponents.Add(EAppearance::Tail, CreateDefaultSubobject<USkeletalMeshComponent>("TailMesh"));
-	AppearanceComponents.Add(EAppearance::Legs, CreateDefaultSubobject<USkeletalMeshComponent>("LegsMesh"));
-	AppearanceComponents.Add(EAppearance::Accessory, CreateDefaultSubobject<USkeletalMeshComponent>("AccessoryMesh"));
+	if (USkeletalMeshComponent* Head = CreateDefaultSubobject<USkeletalMeshComponent>("HeadMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Head, Head);
+	}
+	if (USkeletalMeshComponent* Ears = CreateDefaultSubobject<USkeletalMeshComponent>("EarsMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Ears, Ears);
+	}
+	if (USkeletalMeshComponent* LeftEye = CreateDefaultSubobject<USkeletalMeshComponent>("LeftEyeMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::LeftEye, LeftEye);
+	}
+	if (USkeletalMeshComponent* RightEye = CreateDefaultSubobject<USkeletalMeshComponent>("RightEyeMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::RightEye, RightEye);
+	}
+	if (USkeletalMeshComponent* Mouth = CreateDefaultSubobject<USkeletalMeshComponent>("MouthMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Mouth, Mouth);
+	}
+	if (USkeletalMeshComponent* Torso = CreateDefaultSubobject<USkeletalMeshComponent>("TorsoMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Torso, Torso);
+	}
+	if (USkeletalMeshComponent* Tail = CreateDefaultSubobject<USkeletalMeshComponent>("TailMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Tail, Tail);
+	}
+	if (USkeletalMeshComponent* Legs = CreateDefaultSubobject<USkeletalMeshComponent>("LegsMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Legs, Legs);
+	}
+	if (USkeletalMeshComponent* Accessory = CreateDefaultSubobject<USkeletalMeshComponent>("AccessoryMesh"))
+	{
+		AppearanceComponents.Add(EAppearance::Accessory, Accessory);
+	}
 }
 
 

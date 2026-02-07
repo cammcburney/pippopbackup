@@ -57,7 +57,6 @@ void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* Intera
 			if (CustomTextWidget)
 			{
 				Controller->EnableInput(Controller);
-				CustomTextWidget->AddToViewport();
 				if (UEditableTextBox* EditableText = CustomTextWidget->EditableTextBox)
 				{
 					EditableText->SetFocus();
@@ -65,6 +64,7 @@ void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* Intera
 					EditableText->OnTextCommitted.AddDynamic(this, &AOnlineSessionSwitcher::SessionNameTextCommitted);
 					EditableText->SetText(SessionName->GetText());
 				}
+				CustomTextWidget->AddToViewport();
 			}
 		}
 	}

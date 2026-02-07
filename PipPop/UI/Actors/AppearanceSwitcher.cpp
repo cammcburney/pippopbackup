@@ -11,20 +11,21 @@ AAppearanceSwitcher::AAppearanceSwitcher()
 	PrimaryActorTick.bCanEverTick = false;
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
-	
-	for (int32 i = 0; i < 2; i++)
-	{
-		const FName ComponentName = FName(*FString::Printf(TEXT("Component %i"), i));
-		UStaticMeshComponent* Component = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
-		Component->SetMobility(EComponentMobility::Movable);
-		Component->SetupAttachment(RootComponent);
-		StaticMeshComponents.Add( Component);
-	}
+	const FName ComponentName = FName(*FString::Printf(TEXT("Component 1")));
+	UStaticMeshComponent* Component = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
+	Component->SetMobility(EComponentMobility::Movable);
+	Component->SetupAttachment(RootComponent);
+	StaticMeshComponents.Add( Component);
+	const FName ComponentName2 = FName(*FString::Printf(TEXT("Component 2")));
+	UStaticMeshComponent* Component2 = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName2);
+	Component->SetMobility(EComponentMobility::Movable);
+	Component->SetupAttachment(RootComponent);
+	StaticMeshComponents.Add( Component2);
 }
 
 void AAppearanceSwitcher::OnConstruction(const FTransform& Transform)
 {
-	SetupActor();
+	Super::OnConstruction(Transform);
 }
 
 void AAppearanceSwitcher::BeginPlay()
@@ -66,6 +67,7 @@ void AAppearanceSwitcher::Interact_Implementation(UPrimitiveComponent* Interacte
 	int32 IterateBy = 0;
 	for (int32 i = 0; i < StaticMeshComponents.Num(); i++)
 	{
+		if (!StaticMeshComponents[i]) {return;}
 		if (StaticMeshComponents[i] == InteractedComponent)
 		{
 			IterateBy = (i == 0) ? -1 : 1;
@@ -129,14 +131,16 @@ void AAppearanceSwitcher::SetupActor() const
 	{
 		for (int32 i = 0; i < StaticMeshComponents.Num(); i++)
 		{
-			UStaticMeshComponent* Component = StaticMeshComponents[i];
-			Component->SetStaticMesh(StaticMesh);
-			Component->SetMaterial(0, MeshMaterial);
-			Component->SetRenderCustomDepth(true);
-			Component->SetCustomDepthStencilValue(1);
-			if (i == 1)
+			if (UStaticMeshComponent* Component = StaticMeshComponents[i])
 			{
-				Component->SetRelativeLocation(FVector(0, Distance, 0));
+				Component->SetStaticMesh(StaticMesh);
+				Component->SetMaterial(0, MeshMaterial);
+				Component->SetRenderCustomDepth(true);
+				Component->SetCustomDepthStencilValue(1);
+				if (i == 1)
+				{
+					Component->SetRelativeLocation(FVector(0, Distance, 0));
+				}
 			}
 		}
 	}
