@@ -21,6 +21,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UChatMessage> ChatMessageWidgetClass;
+	
 private:
 	
 	UPROPERTY(meta=(BindWidget))
@@ -33,6 +34,8 @@ public:
 
 	virtual void NativeConstruct();
 
+	void FocusInputBox() const;
+	
 	UFUNCTION()
 	void OnTextChanged(const FText& NewText);
 

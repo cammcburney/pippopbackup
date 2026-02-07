@@ -36,6 +36,10 @@ void UChatBox::OnTextCommited(const FText& Text, ETextCommit::Type CommitMethod)
 				PlayerName = FText::FromString(Name);
 			}
 			PlayerController->ServerSendChatMessage(PlayerName, Text);
+			PlayerController->SetInputMode(FInputModeGameOnly());
+			PlayerController->SetShowMouseCursor(false);
+			ChatInputBox->SetText(FText::GetEmpty());
+			
 		}
 	}
 }
@@ -51,5 +55,13 @@ void UChatBox::UpdateChat(FText PlayerName, FText ChatMessage)
 			ChatScrollBox->AddChild(MessageWidget);
 			ChatScrollBox->ScrollToEnd();
 		}
+	}
+}
+
+void UChatBox::FocusInputBox() const
+{
+	if (IsValid(ChatInputBox))
+	{
+		ChatInputBox->SetKeyboardFocus();
 	}
 }
