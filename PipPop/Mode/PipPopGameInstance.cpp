@@ -11,10 +11,10 @@
 
 UPipPopGameInstance::UPipPopGameInstance()
 {
-	SavedGame = Cast<UPipPopSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
-	if (!SavedGame)
+	SaveGameObject = Cast<UPipPopSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveName, 0));
+	if (!SaveGameObject)
 	{
-		SavedGame = Cast<UPipPopSaveGame>(UGameplayStatics::CreateSaveGameObject(UPipPopSaveGame::StaticClass()));
+		CreateSaveSlot();
 	}
 	FindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::FindSessionsComplete);
 	JoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::JoinPlayerSessionComplete);
@@ -24,7 +24,98 @@ UPipPopGameInstance::UPipPopGameInstance()
 
 void UPipPopGameInstance::SaveCharacterCustomisation(TArray<int32> MeshIndexes)
 {
-	SavedGame->CharacterMeshes = MeshIndexes;
+	SaveGameObject->CharacterMeshes = MeshIndexes;
+}
+
+void UPipPopGameInstance::CreateSaveSlot()
+{
+	SaveGameObject = Cast<UPipPopSaveGame>(UGameplayStatics::CreateSaveGameObject(UPipPopSaveGame::StaticClass()));
+	if (SaveGameObject)
+	{
+		SaveGameObject->SetPlayerID(FGuid::NewGuid());
+		FPlayerSaveData NewPlayerSaveData = FPlayerSaveData();
+		NewPlayerSaveData.SetPlayerName("New Player");
+		SetPlayerSaveData(NewPlayerSaveData);
+	}
+}
+
+void UPipPopGameInstance::SaveGame()
+{
+	if (SaveGameObject)
+	{
+		UGameplayStatics::SaveGameToSlot(SaveGameObject, SaveName, 0);
+	}
+	else
+	{
+		CreateSaveSlot();
+	}
+}
+
+
+void UPipPopGameInstance::SetPlayerSaveData(const FPlayerSaveData& PlayerData)
+{
+	if (SaveGameObject)
+	{
+		const FGuid PlayerID = SaveGameObject->GetPlayerID();
+		TMap<FGuid, FPlayerSaveData> CurrentPlayerSaveData = SaveGameObject->GetPlayerSaveData();
+		if (CurrentPlayerSaveData.Contains(PlayerID))
+		{
+			FPlayerSaveData& ExistingData = CurrentPlayerSaveData[PlayerID];
+			ExistingData.SetPlayerName(PlayerData.GetPlayerName());
+		}
+		else
+		{
+			CurrentPlayerSaveData.Add(PlayerID, PlayerData);
+		}
+		SaveGameObject->SetPlayerSaveData(CurrentPlayerSaveData);
+		SaveGame();
+	}
+}
+
+FName UPipPopGameInstance::GetPlayerName()
+{
+	FName PlayerName = FName("Unknown Player");
+	if (SaveGameObject)
+	{
+		const FGuid PlayerID = SaveGameObject->GetPlayerID();
+		TMap<FGuid, FPlayerSaveData> CurrentPlayerSaveData = SaveGameObject->GetPlayerSaveData();
+		if (CurrentPlayerSaveData.Contains(PlayerID))
+		{
+			const FPlayerSaveData& ExistingData = CurrentPlayerSaveData[PlayerID];
+			PlayerName = ExistingData.GetPlayerName();
+		}
+	}
+	return PlayerName;
+}
+
+void UPipPopGameInstance::SetPlayerName(const FName& NewPlayerName)
+{
+	if (SaveGameObject && !NewPlayerName.IsNone())
+	{
+		const FGuid PlayerID = SaveGameObject->GetPlayerID();
+		TMap<FGuid, FPlayerSaveData> CurrentPlayerSaveData = SaveGameObject->GetPlayerSaveData();
+		if (CurrentPlayerSaveData.Contains(PlayerID))
+		{
+			FPlayerSaveData& ExistingData = CurrentPlayerSaveData[PlayerID];
+			ExistingData.SetPlayerName(NewPlayerName);
+			SaveGameObject->SetPlayerSaveData(CurrentPlayerSaveData);
+			SaveGame();
+		}
+	}
+}
+
+FPlayerSaveData UPipPopGameInstance::LoadPlayerSaveData()
+{
+	if (SaveGameObject)
+	{
+		const FGuid PlayerID = SaveGameObject->GetPlayerID();
+		TMap<FGuid, FPlayerSaveData> CurrentPlayerSaveData = SaveGameObject->GetPlayerSaveData();
+		if (CurrentPlayerSaveData.Contains(PlayerID))
+		{
+			return CurrentPlayerSaveData[PlayerID];
+		}
+	}
+	return FPlayerSaveData();
 }
 
 void UPipPopGameInstance::HostSession(const FName& SessionName)
@@ -169,15 +260,14 @@ void UPipPopGameInstance::DestroySessionComplete(FName SessionName, bool bSucces
 
 IOnlineSessionPtr UPipPopGameInstance::GetSessionInterface()
 {
+	IOnlineSessionPtr OnlineSessionInterface;
 	if (const IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get())
 	{
-		if (const IOnlineSessionPtr OnlineSessionInterface = OnlineSubsystem->GetSessionInterface())
-		{
-			return OnlineSessionInterface;
-		}
+		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
 	}
-	return nullptr;
+	return OnlineSessionInterface;
 }
+
 bool UPipPopGameInstance::TravelToSession(const FName SessionName)
 {
 	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())

@@ -56,15 +56,17 @@ void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* Intera
 			CustomTextWidget = CreateWidget<UCustomText>(Controller, HiddenTextWidgetClass);
 			if (CustomTextWidget)
 			{
+				Controller->SetInputMode(FInputModeUIOnly());
 				Controller->EnableInput(Controller);
+				CustomTextWidget->AddToViewport();
 				if (UEditableTextBox* EditableText = CustomTextWidget->EditableTextBox)
 				{
 					EditableText->SetFocus();
+					EditableText->SetKeyboardFocus();
 					EditableText->OnTextChanged.AddDynamic(this, &AOnlineSessionSwitcher::SessionNameTextUpdated);
 					EditableText->OnTextCommitted.AddDynamic(this, &AOnlineSessionSwitcher::SessionNameTextCommitted);
 					EditableText->SetText(SessionName->GetText());
 				}
-				CustomTextWidget->AddToViewport();
 			}
 		}
 	}
@@ -103,10 +105,12 @@ void AOnlineSessionSwitcher::SessionNameTextCommitted(const FText& Text, ETextCo
 	   }
 		if (ACustomisationController* Controller = Cast<ACustomisationController>(UGameplayStatics::GetPlayerController(this, 0)))
 		{
+			Controller->SetInputMode(FInputModeGameAndUI());
 			Controller->DisableInput(Controller);
 		}
 	}
 }
+
 void AOnlineSessionSwitcher::SetLevelReference()
 {
 	if (const UMapMenu* MapMenu = Cast<UMapMenu>(MapMenuComponent->GetWidget()))

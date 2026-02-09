@@ -33,6 +33,7 @@ void UChatBox::OnTextCommited(const FText& Text, ETextCommit::Type CommitMethod)
 			if (const AShooterPlayerState* PlayerState = Cast<AShooterPlayerState>(PlayerController->PlayerState))
 			{
 				const FString Name = PlayerState->GetPlayerName();
+				GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Emerald, FString::Printf(TEXT("CHAT BOX NAME %s"), *Name));
 				PlayerName = FText::FromString(Name);
 			}
 			PlayerController->ServerSendChatMessage(PlayerName, Text);
@@ -44,13 +45,14 @@ void UChatBox::OnTextCommited(const FText& Text, ETextCommit::Type CommitMethod)
 	}
 }
 
-void UChatBox::UpdateChat(FText PlayerName, FText ChatMessage)
+void UChatBox::UpdateChat(APawn* SpeakingPawn, const FText& PlayerName, const FText& ChatMessage)
 {
 	if (ChatScrollBox && ChatMessageWidgetClass)
 	{
 		if (UChatMessage* MessageWidget = CreateWidget<UChatMessage>(this, ChatMessageWidgetClass))
 		{
 			MessageWidget->SetPlayerName(PlayerName);
+			MessageWidget->SetPawn(SpeakingPawn);
 			MessageWidget->SetChatMessage(ChatMessage);
 			ChatScrollBox->AddChild(MessageWidget);
 			ChatScrollBox->ScrollToEnd();

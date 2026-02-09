@@ -42,5 +42,5 @@ public:
 	UFUNCTION()
 	void OnTextCommited(const FText& Text, ETextCommit::Type CommitMethod);
 
-	void UpdateChat(FText PlayerName, FText ChatMessage);
+	void UpdateChat(APawn* SpeakingPawn, const FText& PlayerName, const FText& ChatMessage);
 };

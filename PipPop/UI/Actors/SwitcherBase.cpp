@@ -44,7 +44,14 @@ void ASwitcherBase::LoadMesh() const
 			StaticMeshComponent->SetStaticMesh(StaticMesh);
 			if (MeshMaterial)
 			{
-				StaticMeshComponent->SetMaterial(0, MeshMaterial);
+				TArray<UMaterialInterface*> Materials = StaticMeshComponent->GetMaterials();
+				for (int i = 0; i < Materials.Num(); i++)
+				{
+					if (Materials[i])
+					{
+						StaticMeshComponent->SetMaterial(i, MeshMaterial);
+					}
+				}
 			}
 		}
 	}

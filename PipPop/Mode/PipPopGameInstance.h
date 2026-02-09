@@ -6,10 +6,12 @@
 #include "Engine/GameInstance.h"
 #include "Data/Save/PipPopSaveGame.h"
 #include "Interfaces/OnlineSessionDelegates.h"
+#include "Data/Save/SaveInterfaces/SaveInterface.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "PipPopGameInstance.generated.h"
 
+class UGameplayStatics;
 /**
  * 
  */
@@ -17,12 +19,16 @@ UCLASS()
 class PIPPOP_API UPipPopGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+	
+	UPROPERTY()
+	TMap<FGuid, FPlayerSaveData> PlayerSave;
 
 	UPROPERTY()
-	FString SaveName = "Default";
-
+	TObjectPtr<UPipPopSaveGame> SaveGameObject;
+	
 	UPROPERTY()
-	TObjectPtr<UPipPopSaveGame> SavedGame;
+	FString SaveName = TEXT("Default");
+
 	
 public:
 
@@ -34,8 +40,18 @@ public:
 	
 	void SaveCharacterCustomisation(TArray<int32> MeshIndexes);
 
-	void LoadGame();
+	void CreateSaveSlot();
 
+	void SaveGame();
+	
+	void SetPlayerSaveData(const FPlayerSaveData& PlayerData);
+
+	FName GetPlayerName();
+	
+	void SetPlayerName(const FName& NewPlayerName);
+	
+	FPlayerSaveData LoadPlayerSaveData();
+	
 	void HostSession(const FName& SessionName);
 
 	void FindSessions();
