@@ -39,3 +39,15 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCombatComponent, Health)
 }
+
+void UCombatComponent::TakeDamage_Implementation(const float Damage)
+{
+	Health -= Damage;
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Health: %d"), Health));
+}
+
+bool UCombatComponent::TakeDamage_Validate(const float Damage)
+{
+	return true;
+}
+

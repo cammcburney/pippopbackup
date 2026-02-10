@@ -17,9 +17,15 @@ public:
 	UCombatComponent();
 
 	UPROPERTY(Replicated)
-	int32 Health;
+	int32 Health = 500;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void TakeDamage(const float Damage);
+	virtual void TakeDamage_Implementation(const float Damage);
+	virtual bool TakeDamage_Validate(const float Damage);
+
 	
 protected:
 	// Called when the game starts
