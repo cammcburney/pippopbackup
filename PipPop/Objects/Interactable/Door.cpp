@@ -63,7 +63,6 @@ void ADoor::ToggleDoor()
 {
 	bOpened = !bOpened;
 	OnRep_DoorToggled();
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Door toggled %d"), bOpened));
 }
 
 void ADoor::ServerToggleDoor_Implementation()
@@ -80,10 +79,12 @@ void ADoor::OnRep_DoorToggled()
 {
 	if (bOpened)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("CLOSE")));
 		CloseDoor();
 	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("OPEN")));
 		OpenDoor();
 	}
 }
