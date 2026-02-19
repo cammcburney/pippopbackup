@@ -16,7 +16,7 @@ public:
 	// Sets default values for this component's properties
 	UCombatComponent();
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, BlueprintReadOnly)
 	int32 Health = 500;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
@@ -26,7 +26,8 @@ public:
 	virtual void TakeDamage_Implementation(const float Damage);
 	virtual bool TakeDamage_Validate(const float Damage);
 
-	
+	UFUNCTION(BlueprintCallable)
+	float GetHealth() {return Health;}	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

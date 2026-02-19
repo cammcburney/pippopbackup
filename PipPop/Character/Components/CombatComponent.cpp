@@ -2,6 +2,8 @@
 
 
 #include "Character/Components/CombatComponent.h"
+
+#include "Character/ShooterPlayerCharacter.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
@@ -11,6 +13,7 @@ UCombatComponent::UCombatComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
+	SetIsReplicated(true);
 	
 	// ...
 }
@@ -42,8 +45,14 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 
 void UCombatComponent::TakeDamage_Implementation(const float Damage)
 {
-	Health -= Damage;
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Health: %d"), Health));
+	Health = FMath::Clamp(Health - Damage, 0.0f, Health);
+	if (Health <= 0)
+	{
+		if (AShooterPlayerCharacter* PlayerCharacter = Cast<AShooterPlayerCharacter>(GetOwner()))
+		{
+			PlayerCharacter->PlayerDeath();
+		}
+	}
 }
 
 bool UCombatComponent::TakeDamage_Validate(const float Damage)
