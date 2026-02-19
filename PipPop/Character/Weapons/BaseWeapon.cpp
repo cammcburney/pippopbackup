@@ -16,7 +16,6 @@ ABaseWeapon::ABaseWeapon()
 	{
 		SkeletalMeshComponent->SetSkeletalMesh(SkeletalMesh);
 	}
-
 }
 
 // Called when the game starts or when spawned
@@ -33,21 +32,35 @@ void ABaseWeapon::BeginPlay()
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void ABaseWeapon::Fire_Implementation()
 {
 	if (ProjectileClass)
 	{
-		if (UWorld* World = GetWorld())
+		if (const UWorld* World = GetWorld())
 		{
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.Instigator = Cast<APawn>(GetOwner());
-			SpawnParameters.Owner = this;
-			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			SpawnParameters.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
-			World->SpawnActor<ABulletProjectile>(ProjectileClass, GetActorLocation() + FVector(100, 0, 50), GetActorRotation(), SpawnParameters);
+			bFiring = true;
+
+			const float TimeSinceLastShot = World->GetTimeSeconds() - LastFireTime;
+			const float RemainingTime = RateOfFire - TimeSinceLastShot;
+			if (TimeSinceLastShot > RateOfFire)
+			{
+				for (int32 i = 0; i < BulletsFiredPerShot; i++)
+				{
+					FireProjectile();
+				}
+			}
+			else
+			{
+				for (int32 i = 0; i < BulletsFiredPerShot; i++)
+				{
+					if (bIsAutomatic)
+					{
+						World->GetTimerManager().SetTimer(FiringTimerHandle, this, &ABaseWeapon::FireProjectile, RemainingTime, false);
+					}
+				}
+			}
 		}
 	}
 }
@@ -57,3 +70,30 @@ bool ABaseWeapon::Fire_Validate()
 	return true;
 }
 
+FBulletTrajectory ABaseWeapon::CalculateBulletTrajectory(const FVector& Location, const FRotator& Rotation)
+{
+	FRotator SpreadRotation = Rotation;
+	SpreadRotation.Pitch += FMath::RandRange(-SpreadAngles.DownAngle, SpreadAngles.UpAngle); 
+	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle);    
+	const FVector SpreadVector = SpreadRotation.Vector();
+	const FVector Start = Location + FVector(200, 0, 50) + SpreadVector;
+	const FRotator SpreadRotator = SpreadRotation.GetEquivalentRotator();
+	const  FRotator ShotDirection = SpreadRotator;
+	return FBulletTrajectory{ ShotDirection, Start };
+}
+
+void ABaseWeapon::FireProjectile()
+{
+	if (UWorld* World = GetWorld())
+	{
+		LastFireTime = World->GetTimeSeconds();
+		const AController* PlayerController = GetOwner()->GetInstigatorController();
+		const FBulletTrajectory BulletTrajectory = CalculateBulletTrajectory(GetActorLocation(), PlayerController->GetControlRotation());
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Instigator = Cast<APawn>(GetOwner());
+		SpawnParameters.Owner = this;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParameters.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
+		World->SpawnActor<ABulletProjectile>(ProjectileClass, BulletTrajectory.Start, BulletTrajectory.ShotDirection, SpawnParameters);
+	}
+}
