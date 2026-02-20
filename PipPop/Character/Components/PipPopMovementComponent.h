@@ -71,6 +71,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(ClampMin=0, ClampMax=100))
 	float GravityScaleMultiplier = 3.3f;
 
+	bool bIsSliding: 1;
+	
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void Slide();
+	virtual void Slide_Implementation();
+	virtual bool Slide_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void StopSliding();
+	virtual void StopSliding_Implementation();
+	virtual bool StopSliding_Validate();
+	
 private:
 	
 	FTimerHandle WallJumpCooldown;

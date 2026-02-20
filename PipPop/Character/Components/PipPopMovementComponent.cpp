@@ -4,6 +4,7 @@
 #include "Character/Components/PipPopMovementComponent.h"
 
 #include "Character/ShooterPlayerCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PhysicsVolume.h"
 #define ECC_WALLJUMP ECC_GameTraceChannel2
@@ -169,6 +170,48 @@ void UPipPopMovementComponent::TickComponent(float DeltaTime, enum ELevelTick Ti
 	{
 		FallTime += DeltaTime;
 	}
+}
+
+void UPipPopMovementComponent::Slide_Implementation()
+{
+	if (!bIsSliding)
+	{
+		bIsSliding = true;
+		if (AShooterPlayerCharacter* PlayerCharacter = Cast<AShooterPlayerCharacter>(GetOwner()))
+		{
+			UCapsuleComponent* Capsule = PlayerCharacter->GetCapsuleComponent();
+			// GroundFriction = GroundFriction / 2;
+			if (!Capsule) {bIsSliding = false; return;}
+			// float HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+			// const float CapsuleHeight = FMath::Lerp(HalfHeight, HalfHeight / 2,  1.f);
+			// Capsule->SetCapsuleHalfHeight(HalfHeight / 2);
+			FVector SlideVelocity = (PlayerCharacter->GetActorForwardVector() * PlayerCharacter->GetVelocity().Size2D()) * 1.2f;
+			SlideVelocity.Z = -200.f;
+			PlayerCharacter->LaunchCharacter(SlideVelocity, true, true);
+		}
+	}
+}
+
+bool UPipPopMovementComponent::Slide_Validate()
+{
+	return true;
+}
+
+void UPipPopMovementComponent::StopSliding_Implementation()
+{
+	bIsSliding = false;
+	// if (AShooterPlayerCharacter* PlayerCharacter = Cast<AShooterPlayerCharacter>(GetOwner()))
+	// {
+	// 	UCapsuleComponent* Capsule = PlayerCharacter->GetCapsuleComponent();
+	// 	if (!Capsule) {bIsSliding = false; return;}
+	// 	float HalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+	// 	Capsule->SetCapsuleHalfHeight(HalfHeight * 2);
+	// }
+}
+
+bool UPipPopMovementComponent::StopSliding_Validate()
+{
+	return true;
 }
 
 class FNetworkPredictionData_Client* UPipPopMovementComponent::GetPredictionData_Client() const
