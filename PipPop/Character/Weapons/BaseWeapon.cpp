@@ -2,6 +2,9 @@
 
 
 #include "Character/Weapons/BaseWeapon.h"
+
+#include "HeadMountedDisplayTypes.h"
+#include "Camera/CameraComponent.h"
 #include "Ammo/BulletProjectile.h"
 
 // Sets default values
@@ -11,27 +14,56 @@ ABaseWeapon::ABaseWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
+	check(SkeletalMeshComponent);
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
-	if (SkeletalMesh)
-	{
-		SkeletalMeshComponent->SetSkeletalMesh(SkeletalMesh);
-	}
+	SightsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SightsCamera"));
+	check(SightsCamera);
+	SightsCamera->SetupAttachment(SkeletalMeshComponent, FName("Sights"));
+	SightsCamera->SetRelativeLocationAndRotation(FVector(30.f, 0.f, 25.f), FRotator::ZeroRotator);
+	SightsCamera->bUsePawnControlRotation = true;
+	SightsCamera->bEnableFirstPersonFieldOfView = true;
+	SightsCamera->bEnableFirstPersonScale = true;
+	SightsCamera->FirstPersonFieldOfView = AimFieldOfView;
+	SightsCamera->FirstPersonScale = 0.6;
+	SightsCamera->SetAutoActivate(false);
 }
 
 // Called when the game starts or when spawned
 void ABaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	if (SkeletalMesh)
-	{
-		SkeletalMeshComponent->SetSkeletalMesh(SkeletalMesh);
-	}
 }
 
 // Called every frame
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void ABaseWeapon::Aim_Implementation()
+{
+	bIsAiming = true;
+	SightsCamera->Activate();
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetInstigatorController()))
+	{
+		PlayerController->SetViewTargetWithBlend(this, .5f);
+	}
+}
+
+bool ABaseWeapon::Aim_Validate()
+{
+	return true;
+}
+
+void ABaseWeapon::StopAim_Implementation()
+{
+	bIsAiming = false;
+	SightsCamera->Deactivate();
+}
+
+bool ABaseWeapon::StopAim_Validate()
+{
+	return true;
 }
 
 void ABaseWeapon::Fire_Implementation()
@@ -72,11 +104,16 @@ bool ABaseWeapon::Fire_Validate()
 
 FBulletTrajectory ABaseWeapon::CalculateBulletTrajectory(const FVector& Location, const FRotator& Rotation)
 {
-	FRotator SpreadRotation = Rotation;
-	SpreadRotation.Pitch += FMath::RandRange(-SpreadAngles.DownAngle, SpreadAngles.UpAngle); 
-	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle);    
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("bIsAiming %s"), bIsAiming ? TEXT("true") : TEXT("false")));
+	FRotator SocketRotation = SkeletalMeshComponent->GetSocketRotation("Muzzle");
+	FRotator SpreadRotation = SocketRotation;
+	float SpreadMultiplier = bIsAiming ? AimingSpreadReduction : 1.f;
+	SpreadRotation.Pitch += FMath::RandRange(-SpreadAngles.DownAngle, SpreadAngles.UpAngle) * SpreadMultiplier; 
+	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle) * SpreadMultiplier;  
 	const FVector SpreadVector = SpreadRotation.Vector();
-	const FVector Start = Location + FVector(200, 0, 50) + SpreadVector;
+	const FVector MuzzleLocation = SkeletalMeshComponent->GetSocketLocation("Muzzle");
+	const FVector Start = MuzzleLocation + SpreadVector;
+	
 	const FRotator SpreadRotator = SpreadRotation.GetEquivalentRotator();
 	const  FRotator ShotDirection = SpreadRotator;
 	return FBulletTrajectory{ ShotDirection, Start };

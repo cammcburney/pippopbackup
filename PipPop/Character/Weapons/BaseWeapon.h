@@ -7,6 +7,7 @@
 #include "BaseWeapon.generated.h"
 
 class ABulletProjectile;
+class UCameraComponent;
 
 USTRUCT(BlueprintType)
 struct FBulletTrajectory
@@ -45,9 +46,6 @@ public:
 	ABaseWeapon();
 
 	UPROPERTY(EditAnywhere)
-	USkeletalMesh* SkeletalMesh;
-
-	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletProjectile> ProjectileClass;
 
 	UPROPERTY(EditAnywhere)
@@ -61,19 +59,29 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 BulletsFiredPerShot = 5;
-	
+
+	UPROPERTY(VisibleAnywhere, Category = Camera)
+	TObjectPtr<UCameraComponent> SightsCamera;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AimFieldOfView = 70.f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float AimingSpreadReduction = .7f;
 private:
 
-	UPROPERTY()
-	USkeletalMeshComponent* SkeletalMeshComponent;
-
 	bool bFiring = false;
-
+	
 	float LastFireTime = 0.0f;
 	
 	FTimerHandle FiringTimerHandle;
-
+	
 	FBulletTrajectory CalculateBulletTrajectory(const FVector& Location, const FRotator& Rotation);
+
+	bool bIsAiming = false;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -82,6 +90,16 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void Aim();
+	virtual void Aim_Implementation();
+	virtual bool Aim_Validate();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void StopAim();
+	virtual void StopAim_Implementation();
+	virtual bool StopAim_Validate();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Fire();
