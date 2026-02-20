@@ -8,7 +8,7 @@
 
 class UProjectileMovementComponent;
 
-UCLASS()
+UCLASS(Blueprintable)
 class PIPPOP_API ABulletProjectile : public AActor
 {
 	GENERATED_BODY()
@@ -25,15 +25,47 @@ public:
 
 	UPROPERTY(EditAnywhere, Replicated)
 	float Damage = 10;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=1, ClampMax=10000))
+	float InitVelocity = 10000.f;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=1, ClampMax=10000))
+	float MaxSpeed = 10000.f;
 	
+	UPROPERTY(EditAnywhere)
+	float Lifetime = 2.f;
+
+	UPROPERTY(EditAnywhere, meta=(ClampMin=-100, ClampMax=100))
+	float GravityScale = .1f;
+	FTimerHandle DestroyTimer;
+
+	// Randomised in begin play by default
+	UPROPERTY(EditAnywhere)
+	FVector CurveDirection;
+
+	// How much the bullet will curve 
+	UPROPERTY(EditAnywhere)
+	float CurveMaxStrength = 50.f;
+
+	// Curve exponent, higher values for a later more intense curve, lower for earlier more constant curve
+	UPROPERTY(EditAnywhere)
+	float CurveExponent = 1.5f;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCurveFloat> BulletCurve;
+
 private:
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> ProjectileMeshComponent;
 	
 	UPROPERTY()
 	TObjectPtr<UProjectileMovementComponent> MovementComponent;
 
+	float SpawnTime;
+
+	FVector SpawnLocation;
+	
 public:
 	
 	UFUNCTION()
@@ -43,12 +75,11 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	
-	
 public:	
 	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void DestroyParticle();
 };

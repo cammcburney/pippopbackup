@@ -5,6 +5,7 @@
 #include "Character/ShooterPlayerCharacter.h"
 #include "Character/Components/CombatComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -16,9 +17,9 @@ ABulletProjectile::ABulletProjectile()
 	ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
 	SetRootComponent(ProjectileMeshComponent);
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComponent"));
-	MovementComponent->InitialSpeed = 6000.0f;
-	MovementComponent->MaxSpeed = 6000.0f;
-	MovementComponent->ProjectileGravityScale = 1;
+	MovementComponent->InitialSpeed = InitVelocity * 100.f;
+	MovementComponent->MaxSpeed = MaxSpeed * 100.f;
+	MovementComponent->ProjectileGravityScale = GravityScale;
 	MovementComponent->bShouldBounce = false;
 	if (BulletMesh)
 	{
@@ -34,16 +35,29 @@ ABulletProjectile::ABulletProjectile()
 void ABulletProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	if (BulletMesh)
+
+	SpawnTime = GetWorld()->GetTimeSeconds();
+	SpawnLocation = GetActorLocation();
+	MovementComponent->Velocity = GetActorForwardVector() * (InitVelocity * 100.f);
+	CurveDirection = FVector(
+		FMath::RandRange(-1.f, 1.f),
+		FMath::RandRange(-1.f, 1.f),
+		FMath::RandRange(-1.f, 1.f)
+	).GetSafeNormal();
+	if (ProjectileMeshComponent)
 	{
-		ProjectileMeshComponent->SetStaticMesh(BulletMesh);
-		if (BulletMaterial)
+		// ProjectileMeshComponent->SetCollisionProfileName(FName("Projectile"));
+		if (BulletMesh)
 		{
-			ProjectileMeshComponent->SetMaterial(0, BulletMaterial);
+			ProjectileMeshComponent->SetStaticMesh(BulletMesh);
+			if (BulletMaterial)
+			{
+				ProjectileMeshComponent->SetMaterial(0, BulletMaterial);
+			}
 		}
 	}
 	ProjectileMeshComponent->OnComponentHit.AddDynamic(this, &ABulletProjectile::ProjectileHit);
-	SetActorRotation(FRotator(0, 0, 90));
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &ABulletProjectile::DestroyParticle, Lifetime, false);
 }
 
 void ABulletProjectile::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -54,16 +68,24 @@ void ABulletProjectile::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 
 // Called every frame
 void ABulletProjectile::Tick(float DeltaTime)
-{
+{	
 	Super::Tick(DeltaTime);
-	FRotator Rotation = FRotator(0, 0, 360);
-	AddActorLocalRotation(Rotation * DeltaTime);
+	AddActorLocalRotation(FRotator(0, 0, 360) * DeltaTime);
+	if (MovementComponent)
+	{
+		const float LifetimePercent = FMath::Clamp((GetWorld()->GetTimeSeconds() - SpawnTime) / Lifetime, 0.f, 1.f);
+		float CurveIntensity = CurveIntensity = FMath::Pow(LifetimePercent, CurveExponent);
+		if (BulletCurve)
+		{
+			CurveIntensity = BulletCurve->GetFloatValue(LifetimePercent);
+		}
+		MovementComponent->Velocity += CurveDirection.GetSafeNormal() * (CurveMaxStrength * 100) * CurveIntensity * DeltaTime;
+	}
+	
 }
 
 void ABulletProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("HIT"));
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("ACTOR HIT %s"), *HitComponent->GetName()));
 	if (HasAuthority())
 	{
 		if (AShooterPlayerCharacter* HitPlayer = Cast<AShooterPlayerCharacter>(OtherActor))
@@ -73,8 +95,17 @@ void ABulletProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor*
 				CombatComponent->TakeDamage(Damage);
 			}
 		}
+		DestroyParticle();
 	}
-	Destroy();
+	
 }
 
+void ABulletProjectile::DestroyParticle()
+{
+	if (HasAuthority())
+	{
+		Destroy();
+	}
+	GetWorld()->GetTimerManager().ClearTimer(DestroyTimer);
+}
 
