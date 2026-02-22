@@ -22,10 +22,13 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	SetReplicates(true);
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = true;
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCameraComponent"));
 	check(FirstPersonCameraComponent);
 	FirstPersonCameraComponent->SetupAttachment(GetMesh());
-	FirstPersonCameraComponent->SetRelativeLocationAndRotation(FVector(30.f, 0.f, 25.f), FRotator::ZeroRotator);
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(30.f, 0.f, 25.f));
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 	FirstPersonCameraComponent->bEnableFirstPersonFieldOfView = true;
 	FirstPersonCameraComponent->bEnableFirstPersonScale = true;
@@ -35,6 +38,7 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	check(CombatComponent);
 	PrimaryWeapon = CreateDefaultSubobject<ABaseWeapon>(TEXT("PrimaryWeaponClass"));
 	check(PrimaryWeapon)
+	
 }
 
 // Called when the game starts or when spawned
@@ -203,6 +207,7 @@ void AShooterPlayerCharacter::PlayerAim()
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->Aim();
+		EquippedWeapon->ClientAim();
 	}
 }
 
@@ -215,6 +220,7 @@ void AShooterPlayerCharacter::PlayerStopAiming()
 	if (EquippedWeapon)
 	{
 		EquippedWeapon->StopAim();
+		EquippedWeapon->ClientStopAiming();
 		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 		{
 			PlayerController->SetViewTargetWithBlend(this, .3f, VTBlend_Linear, 0, true);
@@ -247,10 +253,6 @@ void AShooterPlayerCharacter::PlayerDeath_Implementation()
 				PlayerController->Possess(SpecPawn);
 			}
 		}
-	}
-	if (USkeletalMeshComponent* SkeletalMesh = GetMesh())
-	{
-		SkeletalMesh->SetSimulatePhysics(true);
 	}
 	SetActorRotation(FRotator(-90.f, -15.f, -30.f));
 }

@@ -43,11 +43,6 @@ void ABaseWeapon::Tick(float DeltaTime)
 void ABaseWeapon::Aim_Implementation()
 {
 	bIsAiming = true;
-	SightsCamera->Activate();
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetInstigatorController()))
-	{
-		PlayerController->SetViewTargetWithBlend(this, .5f);
-	}
 }
 
 bool ABaseWeapon::Aim_Validate()
@@ -55,9 +50,22 @@ bool ABaseWeapon::Aim_Validate()
 	return true;
 }
 
+void ABaseWeapon::ClientAim()
+{
+	SightsCamera->Activate();
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetInstigatorController()))
+	{
+		PlayerController->SetViewTargetWithBlend(this, .5f);
+	}
+}
+
 void ABaseWeapon::StopAim_Implementation()
 {
 	bIsAiming = false;
+}
+
+void ABaseWeapon::ClientStopAiming()
+{
 	SightsCamera->Deactivate();
 }
 

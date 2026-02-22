@@ -95,11 +95,15 @@ public:
 	virtual void Aim();
 	virtual void Aim_Implementation();
 	virtual bool Aim_Validate();
-
+	
+	virtual void ClientAim();
+	
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void StopAim();
 	virtual void StopAim_Implementation();
 	virtual bool StopAim_Validate();
+
+	virtual void ClientStopAiming();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void Fire();
