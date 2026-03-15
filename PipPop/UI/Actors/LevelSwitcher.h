@@ -16,12 +16,20 @@ class PIPPOP_API ALevelSwitcher : public ASwitcherBase
 	
 public:	
 
+	ALevelSwitcher();
+	
 	UPROPERTY(EditInstanceOnly)
 	TSubclassOf<UUserWidget> TransitionWidgetClass;
 
+	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
+
+	void SetLevelReference(const ELevelStructs NewLevelReference) {LevelReference = NewLevelReference;}
+	
+private:
+	
 	UPROPERTY(EditInstanceOnly)
 	ELevelStructs LevelReference;
 	
-	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
-
+	bool bInteracted = false;
+	
 };
