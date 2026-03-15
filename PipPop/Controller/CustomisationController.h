@@ -13,5 +13,9 @@ UCLASS()
 class PIPPOP_API ACustomisationController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+
+	virtual void OnPossess(APawn* NewPawn) override;
 	
 };
