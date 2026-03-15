@@ -7,19 +7,15 @@ ASwitcherBase::ASwitcherBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
+	check(StaticMeshComponent);
+	StaticMeshComponent->SetupAttachment(RootComponent);
+	LoadMesh();
 	TextComponent = CreateDefaultSubobject<UText3DComponent>(TEXT("TextComponent"));
-	if (StaticMeshComponent)
+	check(TextComponent);
+	TextComponent->SetupAttachment(RootComponent);
+	if (MenuFont)
 	{
-		StaticMeshComponent->SetupAttachment(RootComponent);
-		LoadMesh();
-	}
-	if (TextComponent)
-	{
-		TextComponent->SetupAttachment(RootComponent);
-		if (MenuFont)
-		{
-			TextComponent->SetFont(MenuFont);
-		}
+		TextComponent->SetFont(MenuFont);
 	}
 }
 
