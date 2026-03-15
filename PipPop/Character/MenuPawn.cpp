@@ -12,9 +12,21 @@
 AMenuPawn::AMenuPawn()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	check(SpringArm)
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 350.f;
+	SpringArm->SetRelativeRotation(FRotator(0, -180.f, 0));
+	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	check(CameraComponent)
+	CameraComponent->SetupAttachment(SpringArm);
+	CameraComponent->SetRelativeRotation(FRotator(0, -180.f, 0));
+	CameraComponent->SetFieldOfView(90);
+	
 	InteractionComponent = CreateDefaultSubobject<UWidgetInteractionComponent>("InteractionComponent");
+	check(InteractionComponent)
 	InteractionComponent->InteractionSource = EWidgetInteractionSource::Mouse;
 	InteractionComponent->InteractionDistance = 10000.f;
 }
@@ -22,6 +34,10 @@ AMenuPawn::AMenuPawn()
 void AMenuPawn::BeginPlay()
 {
 	Super::BeginPlay();
+	if (InteractionComponent)
+	{
+		InteractionComponent->Activate();
+	}
 	if (APlayerController* PC = Cast<APlayerController>(GetController()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer()))
@@ -32,22 +48,6 @@ void AMenuPawn::BeginPlay()
 		FInputModeGameAndUI InputMode;
 		PC->SetInputMode(InputMode);
 		PC->SetViewTargetWithBlend(this);
-	}
-	if (SpringArm)
-	{
-		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->TargetArmLength = 350.f;
-		SpringArm->SetRelativeRotation(FRotator(0, -180.f, 0));
-	}
-	if (CameraComponent)
-	{
-		CameraComponent->SetupAttachment(SpringArm);
-		CameraComponent->SetRelativeRotation(FRotator(0, -180.f, 0));
-		CameraComponent->SetFieldOfView(90);
-	}
-	if (InteractionComponent)
-	{
-		InteractionComponent->Activate();
 	}
 }
 
