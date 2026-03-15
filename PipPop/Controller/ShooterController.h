@@ -28,7 +28,7 @@ private:
 	TObjectPtr<UChatBox> PlayerChatBox;
 
 public:
-
+	
 	void FocusChat();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -43,6 +43,8 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void OnPossess(APawn* NewPawn) override;
 	
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnPlayer(APlayerController* PlayerController);

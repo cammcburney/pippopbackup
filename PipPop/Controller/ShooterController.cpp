@@ -25,6 +25,15 @@ void AShooterController::BeginPlay()
 			}
 		}
 	}
+	SetInputMode(FInputModeGameOnly());
+}
+
+void AShooterController::OnPossess(APawn* NewPawn)
+{
+	Super::OnPossess(NewPawn);
+	FInputModeGameOnly GameInput;
+	SetInputMode(GameInput);
+	SetShowMouseCursor(false);
 }
 
 void AShooterController::ServerSpawnPlayer_Implementation(APlayerController* PlayerController)
