@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "GameFramework/PlayerStart.h"
 #include "ShooterMode.generated.h"
 
 class AShooterState;
 class AShooterPlayerCharacter;
 class AShooterPlayerState;
 class AShooterController;
+
 /**
  * 
  */

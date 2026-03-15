@@ -6,7 +6,6 @@
 #include "Character/ShooterPlayerCharacter.h"
 #include "Character/State/ShooterPlayerState.h"
 #include "Controller/ShooterController.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 AShooterMode::AShooterMode()
@@ -47,18 +46,24 @@ FTransform AShooterMode::FindPlayerStart()
 {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(),FoundActors);
+
+	PlayerStarts.Reset();
+	
 	for (AActor* Actor : FoundActors)
 	{
 		if (APlayerStart* Start = Cast<APlayerStart>(Actor))
 		{
-			PlayerStarts.Add(Start);	
+			PlayerStarts.AddUnique(Start);	
 		}
 	}
-	int32 NewIndex = FMath::RandRange(0, PlayerStarts.Num() - 1);
-	if (FoundActors.IsValidIndex(NewIndex))
+	if (PlayerStarts.Num() > 0)
 	{
-		const FTransform ActorTransform = FoundActors[NewIndex]->GetActorTransform();
-		return ActorTransform;
+		int32 NewIndex = FMath::RandRange(0, PlayerStarts.Num() - 1);
+		if (FoundActors.IsValidIndex(NewIndex))
+		{
+			const FTransform ActorTransform = PlayerStarts[NewIndex]->GetActorTransform();
+			return ActorTransform;
+		}
 	}
 	return FTransform();
 }
