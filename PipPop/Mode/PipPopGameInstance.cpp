@@ -129,7 +129,7 @@ void UPipPopGameInstance::HostSession(const FName& SessionName)
 			return;
 		}
 		SessionSettings = MakeShareable(new FOnlineSessionSettings());
-		SessionSettings->bIsLANMatch = true;
+		SessionSettings->bIsLANMatch = false;
 		SessionSettings->bUsesPresence = true;
 		SessionSettings->bIsDedicated = false;
 		SessionSettings->bAllowInvites = true;
@@ -137,9 +137,9 @@ void UPipPopGameInstance::HostSession(const FName& SessionName)
 		SessionSettings->bAllowJoinViaPresence = true;
 		SessionSettings->bAllowJoinViaPresenceFriendsOnly = false;
 		SessionSettings->bShouldAdvertise = true;
-		SessionSettings->bIsDedicated = false;
 		SessionSettings->NumPublicConnections = 16;
 		SessionSettings->NumPrivateConnections = 2;
+		SessionSettings->bUseLobbiesIfAvailable = true;
 		SessionSettings->Set(FName(TEXT("ServerName")), FOnlineSessionSetting(SessionName.ToString(), EOnlineDataAdvertisementType::ViaOnlineService));
 		
 		const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
@@ -157,11 +157,10 @@ void UPipPopGameInstance::FindSessions()
 		FindSessionsCompleteHandle = OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
 		
 		SearchSettings = MakeShareable(new FOnlineSessionSearch());
-		SearchSettings->bIsLanQuery = true;
-		SearchSettings->MaxSearchResults = 5;
+		SearchSettings->bIsLanQuery = false;
+		SearchSettings->MaxSearchResults = 100;
 		SearchSettings->PingBucketSize = 30;
-		SearchSettings->TimeoutInSeconds = 30.f;
-		
+		SearchSettings->TimeoutInSeconds = 120.f;
 		const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 		if (OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SearchSettings.ToSharedRef()))
 		{
@@ -277,14 +276,11 @@ bool UPipPopGameInstance::TravelToSession(const FName SessionName)
 		if (OnlineSessionInterface->GetResolvedConnectString(SessionName, ConnectionInfo))
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("ConnectionInfo Name: %s"), *ConnectionInfo));
-			// Remove port from string, leaving only ip
-			FString SplitString;
-			FString R;
-			ConnectionInfo.Split(":", &SplitString, &R);
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("Modified ConnectionInfo Name: %s"), *SplitString));
-			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-			PlayerController->ClientTravel(SplitString, TRAVEL_Absolute);
-			return true;
+			if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+			{
+				PlayerController->ClientTravel(ConnectionInfo, TRAVEL_Absolute);
+				return true;
+			}
 		}
 	}
 	return false;
