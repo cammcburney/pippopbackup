@@ -78,7 +78,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void PossessedBy(AController* NewController) override;
-
+	
 	virtual void OnRep_Controller() override;
 	
 	UFUNCTION(BlueprintCallable)
