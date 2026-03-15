@@ -8,8 +8,6 @@
 
 ANameSwitcher::ANameSwitcher()
 {
-	TextComponent = CreateDefaultSubobject<UText3DComponent>(TEXT("PlayerName"));
-	TextComponent->SetupAttachment(RootComponent);
 }
 
 void ANameSwitcher::BeginPlay()
@@ -18,15 +16,10 @@ void ANameSwitcher::BeginPlay()
 	if (UPipPopGameInstance* GameInstance = Cast<UPipPopGameInstance>(GetGameInstance()))
 	{
 		const FString NewPlayerName = GameInstance->GetPlayerName().ToString();
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("%s"), *NewPlayerName));
 		if (TextComponent)
 		{
 			TextComponent->SetText(FText::FromString(NewPlayerName));
 		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, TEXT("No Name"));
 	}
 }
 
