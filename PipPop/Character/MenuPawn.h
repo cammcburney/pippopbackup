@@ -14,6 +14,7 @@ class USpringArmComponent;
 class UEnhancedInputComponent;
 class UInputAction;
 class UInputMappingContext;
+class UCustomisationInterface;
 
 USTRUCT()
 struct FMenuInputActions
