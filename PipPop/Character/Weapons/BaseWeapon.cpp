@@ -2,8 +2,6 @@
 
 
 #include "Character/Weapons/BaseWeapon.h"
-
-#include "HeadMountedDisplayTypes.h"
 #include "Camera/CameraComponent.h"
 #include "Ammo/BulletProjectile.h"
 
