@@ -11,6 +11,7 @@
 
 void UChatBox::NativeConstruct()
 {
+	Super::NativeConstruct();
 	SetIsFocusable(true);
 	if (ChatInputBox)
 	{
@@ -40,7 +41,6 @@ void UChatBox::OnTextCommited(const FText& Text, ETextCommit::Type CommitMethod)
 			PlayerController->SetInputMode(FInputModeGameOnly());
 			PlayerController->SetShowMouseCursor(false);
 			ChatInputBox->SetText(FText::GetEmpty());
-			
 		}
 	}
 }

@@ -32,7 +32,7 @@ private:
 
 public:
 
-	virtual void NativeConstruct();
+	virtual void NativeConstruct() override;
 
 	void FocusInputBox() const;
 	
