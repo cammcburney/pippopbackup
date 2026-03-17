@@ -2,11 +2,12 @@
 
 
 #include "Mode/PipPopGameInstance.h"
-
+#include "OnlineSubsystemUtils.h"
 #include "Menu/MenuMode.h"
 #include "Data/Save/PipPopSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "OnlineSubsystem.h"
+#include "Online/OnlineSessionNames.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
 UPipPopGameInstance::UPipPopGameInstance()
@@ -16,6 +17,7 @@ UPipPopGameInstance::UPipPopGameInstance()
 	{
 		CreateSaveSlot();
 	}
+	CreateSessionCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::HostedSession);
 	FindSessionsCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::FindSessionsComplete);
 	JoinSessionCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::JoinPlayerSessionComplete);
 	EndSessionCompleteDelegate = FOnEndSessionCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::EndSessionCompleted);
@@ -120,7 +122,7 @@ FPlayerSaveData UPipPopGameInstance::LoadPlayerSaveData()
 
 void UPipPopGameInstance::HostSession(const FName& SessionName)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		if (OnlineSessionInterface->GetNamedSession(SessionName))
 		{
@@ -128,6 +130,7 @@ void UPipPopGameInstance::HostSession(const FName& SessionName)
 			// add delegate for session destroyed to unlock host button
 			return;
 		}
+		CreateSessionCompleteDelegateHandle = OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 		SessionSettings = MakeShareable(new FOnlineSessionSettings());
 		SessionSettings->bIsLANMatch = false;
 		SessionSettings->bUsesPresence = true;
@@ -150,17 +153,30 @@ void UPipPopGameInstance::HostSession(const FName& SessionName)
 	}
 }
 
+void UPipPopGameInstance::HostedSession(FName SessionName, bool bHostedSession)
+{
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
+	{
+		OnlineSessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, FString::Printf(TEXT("HOSTED SESSION - SUCCESSFULLY: %s, NAME: %s"), bHostedSession ? TEXT("true") : TEXT("false"), *SessionName.ToString()));
+	if (bHostedSession)
+	{
+		LoadLevel(FName("LVL_SpaceStation"));
+	}
+}
+
 void UPipPopGameInstance::FindSessions()
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		FindSessionsCompleteHandle = OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegate);
 		
 		SearchSettings = MakeShareable(new FOnlineSessionSearch());
 		SearchSettings->bIsLanQuery = false;
 		SearchSettings->MaxSearchResults = 100;
-		SearchSettings->PingBucketSize = 30;
 		SearchSettings->TimeoutInSeconds = 120.f;
+		SearchSettings->QuerySettings.Set(SEARCH_LOBBIES,true, EOnlineComparisonOp::Equals);
 		const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 		if (OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SearchSettings.ToSharedRef()))
 		{
@@ -176,11 +192,12 @@ void UPipPopGameInstance::FindSessions()
 void UPipPopGameInstance::FindSessionsComplete(bool bSearchCompleted)
 {
 	if (!bSearchCompleted) {return;}
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		OnlineSessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteHandle);
 		if (AMenuMode* GameMode = Cast<AMenuMode>(GetWorld()->GetAuthGameMode()))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("SearchCompleted: %i"), SearchSettings->SearchResults.Num()));
 			for (int32 i = 0; i < SearchSettings->SearchResults.Num(); i++)
 			{
 				GameMode->DisplaySessionInfo(SearchSettings->SearchResults[i]);
@@ -191,7 +208,7 @@ void UPipPopGameInstance::FindSessionsComplete(bool bSearchCompleted)
 
 void UPipPopGameInstance::JoinPlayerSession(const FOnlineSessionSearchResult& SearchResult)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		if (const FOnlineSessionSetting* Setting = SearchResult.Session.SessionSettings.Settings.Find(FName(TEXT("ServerName"))))
 		{
@@ -207,7 +224,7 @@ void UPipPopGameInstance::JoinPlayerSession(const FOnlineSessionSearchResult& Se
 void UPipPopGameInstance::JoinPlayerSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type ResultType)
 {
 	GEngine->AddOnScreenDebugMessage(0, 30.f, FColor::Red, FString::Printf(TEXT("Join Result: %d"), (int32)(ResultType)));
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		OnlineSessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 		const bool bHasTravelled = TravelToSession(SessionName);
@@ -224,7 +241,7 @@ void UPipPopGameInstance::JoinPlayerSessionComplete(FName SessionName, EOnJoinSe
 
 void UPipPopGameInstance::EndSession(const FName& SessionName)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		EndSessionCompleteDelegateHandle = OnlineSessionInterface->AddOnEndSessionCompleteDelegate_Handle(EndSessionCompleteDelegate);
 		OnlineSessionInterface->EndSession(SessionName);
@@ -233,7 +250,7 @@ void UPipPopGameInstance::EndSession(const FName& SessionName)
 
 void UPipPopGameInstance::EndSessionCompleted(const FName SessionName, bool bSessionEnded)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		OnlineSessionInterface->ClearOnEndSessionCompleteDelegate_Handle(EndSessionCompleteDelegateHandle);
 		DestroySession(SessionName);
@@ -242,7 +259,7 @@ void UPipPopGameInstance::EndSessionCompleted(const FName SessionName, bool bSes
 
 void UPipPopGameInstance::DestroySession(const FName& SessionName)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		DestroySessionCompleteDelegateHandle = OnlineSessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
 		OnlineSessionInterface->DestroySession(SessionName);
@@ -251,25 +268,15 @@ void UPipPopGameInstance::DestroySession(const FName& SessionName)
 
 void UPipPopGameInstance::DestroySessionComplete(FName SessionName, bool bSuccess)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		OnlineSessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
 	}
 }
 
-IOnlineSessionPtr UPipPopGameInstance::GetSessionInterface()
-{
-	IOnlineSessionPtr OnlineSessionInterface;
-	if (const IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get())
-	{
-		OnlineSessionInterface = OnlineSubsystem->GetSessionInterface();
-	}
-	return OnlineSessionInterface;
-}
-
 bool UPipPopGameInstance::TravelToSession(const FName SessionName)
 {
-	if (const IOnlineSessionPtr OnlineSessionInterface = GetSessionInterface())
+	if (const IOnlineSessionPtr OnlineSessionInterface =  Online::GetSessionInterface(GetWorld()))
 	{
 		FString ConnectionInfo;
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("Session Name: %s"), *SessionName.ToString()));
@@ -288,8 +295,8 @@ bool UPipPopGameInstance::TravelToSession(const FName SessionName)
 
 void UPipPopGameInstance::LoadLevel(const FName LevelName)
 {
-	// UGameplayStatics::OpenLevel(this, LevelName, TRAVEL_Absolute);
 	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Load Level: %s"), *LevelName.ToString()));
-	GetWorld()->ServerTravel("LVL_SpaceStation?Listen", false, false);
+	FString ListenServerMap = LevelName.ToString() + TEXT("?Listen");
+	GetWorld()->ServerTravel(ListenServerMap, false, false);
 }
 

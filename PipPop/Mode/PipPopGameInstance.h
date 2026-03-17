@@ -54,6 +54,8 @@ public:
 	
 	void HostSession(const FName& SessionName);
 
+	void HostedSession(FName SessionName, bool bHostedSession);
+	
 	void FindSessions();
 
 	void FindSessionsComplete(bool bSearchCompleted);
@@ -72,7 +74,9 @@ public:
 	
 	bool TravelToSession(const FName SessionName);
 
-	static IOnlineSessionPtr GetSessionInterface();
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+
+	FDelegateHandle CreateSessionCompleteDelegateHandle;
 	
 	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
 
