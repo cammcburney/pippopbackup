@@ -17,34 +17,11 @@ class PIPPOP_API ASwitcherBase : public AActor, public ICustomisationInterface
 	
 public:	
 	ASwitcherBase();
-	
-	UPROPERTY(EditInstanceOnly)
-	TObjectPtr<UStaticMesh> StaticMesh;
-
-	UPROPERTY(EditInstanceOnly)
-	TObjectPtr<UMaterialInterface> MeshMaterial;
 
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UText3DComponent> TextComponent;
-
-	UPROPERTY(EditInstanceOnly)
-	TObjectPtr<UFont> MenuFont;
-	
-private:
 	
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
-	
-protected:
-	
-	virtual void BeginPlay() override;
-
-public:	
-
-	void LoadMesh() const;
-	
-	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
-
-
 	
 };
