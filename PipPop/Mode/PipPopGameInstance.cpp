@@ -24,11 +24,6 @@ UPipPopGameInstance::UPipPopGameInstance()
 	DestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UPipPopGameInstance::DestroySessionComplete);
 }
 
-void UPipPopGameInstance::SaveCharacterCustomisation(TArray<int32> MeshIndexes)
-{
-	SaveGameObject->CharacterMeshes = MeshIndexes;
-}
-
 void UPipPopGameInstance::CreateSaveSlot()
 {
 	SaveGameObject = Cast<UPipPopSaveGame>(UGameplayStatics::CreateSaveGameObject(UPipPopSaveGame::StaticClass()));

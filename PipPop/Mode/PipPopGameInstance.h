@@ -37,8 +37,6 @@ public:
 	TObjectPtr<UDataTable> GetAppearanceTable() const {return AppearanceTable;} 
 	
 	TObjectPtr<UDataTable> GetLevelTable() const {return LevelTable;}
-	
-	void SaveCharacterCustomisation(TArray<int32> MeshIndexes);
 
 	void CreateSaveSlot();
 
