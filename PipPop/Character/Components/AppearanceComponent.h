@@ -21,6 +21,7 @@ enum class EAppearance : uint8
 	Tail UMETA(DisplayName = "Tail"),
 	Accessory UMETA(DisplayName = "Accessory")
 };
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PIPPOP_API UAppearanceComponent : public UActorComponent
 {
