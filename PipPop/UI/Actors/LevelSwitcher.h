@@ -23,7 +23,7 @@ public:
 
 	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
 
-	void SetLevelReference(const ELevelStructs NewLevelReference) {LevelReference = NewLevelReference;}
+	void SetLevel(const ELevelStructs NewLevelReference) {LevelReference = NewLevelReference;}
 	
 private:
 	
