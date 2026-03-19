@@ -29,10 +29,6 @@ void AShooterMode::Logout(AController* Exiting)
 	{
 		PlayerControllers.Remove(Controller);
 	}
-	else
-	{
-		// UE_LOG(LogTemp, Log, FText::FromString(FString::Printf(TEXT("Player logout failed %s"), *Exiting->GetName())));
-	}
 }
 
 void AShooterMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
