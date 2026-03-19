@@ -16,5 +16,6 @@ UENUM()
 enum class ELevelStructs : uint8
 {
 	Main_Menu = 0 UMETA(DisplayName = "Main Menu"),
-	Customisation = 1 UMETA(DisplayName = "Customisation")
+	Customisation = 1 UMETA(DisplayName = "Customisation"),
+	Space_Station = 2 UMETA(DisplayName = "SpaceStation")
 };
