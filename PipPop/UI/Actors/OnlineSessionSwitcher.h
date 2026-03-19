@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UCustomText> CustomTextWidget;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UStaticMeshComponent> SessionInteractMesh;
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UText3DComponent> SessionName;

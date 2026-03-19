@@ -18,6 +18,7 @@ AOnlineSessionSwitcher::AOnlineSessionSwitcher()
 	MapMenuComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("MapMenu"));
 	MediaPlayer = CreateDefaultSubobject<UMediaPlayer>(TEXT("MediaPlayer"));
 	SessionName = CreateDefaultSubobject<UText3DComponent>(TEXT("SessionName"));
+	SessionInteractMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SessionInteractMesh"));
 	SessionName->SetupAttachment(RootComponent);
 	MapMenuComponent->SetComponentTickEnabled(true);
 	PrimaryActorTick.bCanEverTick = true;
@@ -48,7 +49,7 @@ void AOnlineSessionSwitcher::BeginPlay()
 void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
 	if (!InteractedComponent) {return;}
-	if (InteractedComponent->GetAttachmentRoot()->GetName().Contains(TEXT("SessionName")))
+	if (InteractedComponent == SessionInteractMesh)
 	{
 		if (ACustomisationController* Controller = Cast<ACustomisationController>(UGameplayStatics::GetPlayerController(this, 0)))
 		{
@@ -70,12 +71,12 @@ void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* Intera
 			}
 		}
 	}
-	if (InteractedComponent != MapMenuComponent && !InteractedComponent->GetAttachmentRoot()->GetName().Contains(TEXT("SessionName")))
+	if (InteractedComponent == StaticMeshComponent)
 	{
 		UPipPopGameInstance* GameInst = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance());
 		if (!GameInst) {return;}
 		GameInst->HostSession(*SessionName->GetText().ToString());
-		Super::Interact_Implementation(InteractedComponent);
+		// Super::Interact_Implementation(InteractedComponent);
 	}
 }
 
@@ -115,6 +116,6 @@ void AOnlineSessionSwitcher::SetLevelReference()
 {
 	if (const UMapMenu* MapMenu = Cast<UMapMenu>(MapMenuComponent->GetWidget()))
 	{
-		LevelReference = MapMenu->GetLevel();
+		SetLevel(MapMenu->GetLevel());
 	}
 }
