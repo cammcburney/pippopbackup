@@ -9,23 +9,26 @@
 AAppearanceSwitcher::AAppearanceSwitcher()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
-	const FName ComponentName = FName(*FString::Printf(TEXT("Component 1")));
-	UStaticMeshComponent* Component = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
-	Component->SetMobility(EComponentMobility::Movable);
-	Component->SetupAttachment(RootComponent);
-	StaticMeshComponents.Add( Component);
-	const FName ComponentName2 = FName(*FString::Printf(TEXT("Component 2")));
-	UStaticMeshComponent* Component2 = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName2);
-	Component->SetMobility(EComponentMobility::Movable);
-	Component->SetupAttachment(RootComponent);
-	StaticMeshComponents.Add( Component2);
+	
+	const FName ComponentName = FName(*FString::Printf(TEXT("LeftComponent")));
+	UStaticMeshComponent* LeftComponent = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName);
+	check(LeftComponent)
+	LeftComponent->SetMobility(EComponentMobility::Movable);
+	LeftComponent->SetupAttachment(RootComponent);
+	StaticMeshComponents.Add(LeftComponent);
+	
+	const FName ComponentName2 = FName(*FString::Printf(TEXT("RightComponent")));
+	UStaticMeshComponent* RightComponent = CreateDefaultSubobject<UStaticMeshComponent>(ComponentName2);
+	check(RightComponent)
+	RightComponent->SetMobility(EComponentMobility::Movable);
+	RightComponent->SetupAttachment(RootComponent);
+	StaticMeshComponents.Add(RightComponent);
 }
 
 void AAppearanceSwitcher::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+	SetupActor();
 }
 
 void AAppearanceSwitcher::BeginPlay()
@@ -63,6 +66,7 @@ ACustomisationPawn* AAppearanceSwitcher::GetPlayer() const
 
 void AAppearanceSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, TEXT("CHANGE SOMETHING"));
 	UAppearanceSubsystem* Subsystem = GetAppearanceSubsystem();
 	int32 IterateBy = 0;
 	for (int32 i = 0; i < StaticMeshComponents.Num(); i++)
@@ -125,7 +129,7 @@ UMaterialInterface* AAppearanceSwitcher::GetMaterialAsset(UAppearanceSubsystem* 
 	return AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Material);
 }
 
-void AAppearanceSwitcher::SetupActor() const
+void AAppearanceSwitcher::SetupActor()
 {
 	if (!StaticMeshComponents.IsEmpty() && StaticMesh && MeshMaterial)
 	{
@@ -137,9 +141,13 @@ void AAppearanceSwitcher::SetupActor() const
 				Component->SetMaterial(0, MeshMaterial);
 				Component->SetRenderCustomDepth(true);
 				Component->SetCustomDepthStencilValue(1);
+				if (i == 0)
+				{
+					MainComponentLocation = Component->GetRelativeLocation();
+				}
 				if (i == 1)
 				{
-					Component->SetRelativeLocation(FVector(0, Distance, 0));
+					Component->SetRelativeLocation(FVector(0, Distance, 0) + MainComponentLocation);
 				}
 			}
 		}

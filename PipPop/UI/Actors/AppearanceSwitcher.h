@@ -15,7 +15,7 @@ class ACustomisationPawn;
 class UAppearanceComponent;
 class UGameplayStatics;
 
-UCLASS()
+UCLASS(Blueprintable)
 class PIPPOP_API AAppearanceSwitcher : public AActor, public ICustomisationInterface
 {
 	GENERATED_BODY()
@@ -24,25 +24,27 @@ public:
 	// Sets default values for this actor's properties
 	AAppearanceSwitcher();
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	float Distance = -100.f;
 	
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	EAppearanceType AppearanceType;
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	EAppearance AppearanceCategory;
 	
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	FName AppearanceSection;
 	
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	UStaticMesh* StaticMesh;
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MeshMaterial;
 	
 private:
+
+	FVector MainComponentLocation = FVector::ZeroVector;
 	
 	UPROPERTY()
 	int32 Index = 0;
@@ -68,7 +70,7 @@ public:
 
 	int32 GetNextValidIndex(const int IterateBy) const;
 
-	void SetupActor() const;
+	void SetupActor();
 	
 protected:
 	// Called when the game starts or when spawned
