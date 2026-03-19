@@ -22,6 +22,9 @@ public:
 
 	UPROPERTY(EditInstanceOnly)
 	bool InvertRotation = false;
+
+	UPROPERTY(EditInstanceOnly)
+	float RotationTurn = 90.f;
 	
 private:
 

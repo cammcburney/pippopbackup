@@ -24,7 +24,7 @@ void ARotationSwitcher::BeginPlay()
 		if (UCurveFloat* Curve = NewObject<UCurveFloat>(this, "Curve"))
 		{
 			Curve->FloatCurve.UpdateOrAddKey(0.f, 0.f);
-			Curve->FloatCurve.UpdateOrAddKey(1.f, 90.f);
+			Curve->FloatCurve.UpdateOrAddKey(1.f, RotationTurn);
 			Timeline->AddInterpFloat(Curve, TimelineProgress, FName("TimelineProgress"));
 		}
 		Timeline->SetTimelineLength(4.f);
