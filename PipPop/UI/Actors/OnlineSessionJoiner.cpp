@@ -59,11 +59,11 @@ void AOnlineSessionJoiner::Interact_Implementation(UPrimitiveComponent* Interact
 		if (UPipPopGameInstance* GameInstance = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance()))
 		{
 			GameInstance->FindSessions();
-			bIsFindingSessions = true;
 			GameInstance->FindSessionsCompleteDelegate.BindLambda([this](bool bSuccess)
 			{
 				FindSessionsComplete(bSuccess);
 			});
+			bIsFindingSessions = true;
 		}
 	}
 }
@@ -78,8 +78,8 @@ void AOnlineSessionJoiner::AddMenuItem(USessionEntry* SessionEntry)
 
 void AOnlineSessionJoiner::FindSessionsComplete(bool bSuccess)
 {
-	SetIsFindingSessions(false);
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, "Clear Sessions");
+	bIsFindingSessions = false;
+	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, "Found Sessions");
 	if (bSuccess)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, "SessionsDisplay Complete");

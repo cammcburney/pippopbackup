@@ -27,7 +27,7 @@ private:
 
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UWidgetComponent> SessionsDisplayComponent;
-	
+
 public:	
 
 	AOnlineSessionJoiner();
