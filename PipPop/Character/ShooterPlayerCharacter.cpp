@@ -38,6 +38,11 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	check(CombatComponent);
 	PrimaryWeapon = CreateDefaultSubobject<ABaseWeapon>(TEXT("PrimaryWeaponClass"));
 	check(PrimaryWeapon)
+	GetCharacterMovement()->JumpZVelocity = 850.f;
+	GetCharacterMovement()->GravityScale = 3.f;
+	GetCharacterMovement()->MaxWalkSpeed = 1200.f;
+	
+	
 	
 }
 
@@ -255,6 +260,7 @@ void AShooterPlayerCharacter::PlayerDeath_Implementation()
 		}
 	}
 	SetActorRotation(FRotator(-90.f, -15.f, -30.f));
+	SetLifeSpan(3.f);
 }
 
 bool AShooterPlayerCharacter::PlayerDeath_Validate()
