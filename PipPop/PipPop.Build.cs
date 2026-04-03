@@ -31,10 +31,7 @@ public class PipPop : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new string[] { "OnlineSubsystem" });
 
 		PublicIncludePaths.AddRange(new string[] {
-			"PipPop",
-			"PipPop/Variant_Horror",
-			"PipPop/Variant_Shooter",
-			"PipPop/Variant_Shooter/AI"
+			"PipPop"
 		});
 
 		// Uncomment if you are using Slate UI
