@@ -3,7 +3,10 @@
 
 #include "UI/Widgets/CustomText.h"
 
+#include "Blueprint/WidgetTree.h"
+
 void UCustomText::NativePreConstruct()
 {
+	Super::NativePreConstruct();
 	SetIsFocusable(true);
 }
