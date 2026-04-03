@@ -2,6 +2,7 @@
 
 
 #include "Character/Pawns/Spectator/StaticSpectatorPawn.h"
+#include "Mode/Gameplay/ShooterMode.h"
 
 // Sets default values
 AStaticSpectatorPawn::AStaticSpectatorPawn()
@@ -20,11 +21,25 @@ AStaticSpectatorPawn::AStaticSpectatorPawn()
 
 }
 
+void AStaticSpectatorPawn::RespawnPlayer()
+{
+	SpawnTimer.Invalidate();
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		PlayerController->UnPossess();
+		if (AShooterMode* GameMode = Cast<AShooterMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GameMode->SpawnPlayer(PlayerController);
+		}
+	}
+	Destroy();
+}
+
 // Called when the game starts or when spawned
 void AStaticSpectatorPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AStaticSpectatorPawn::RespawnPlayer, RespawnTime, false);
 }
 
 // Called every frame
@@ -44,6 +59,5 @@ void AStaticSpectatorPawn::Tick(float DeltaTime)
 void AStaticSpectatorPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

@@ -8,6 +8,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "StaticSpectatorPawn.generated.h"
 
+class AShooterMode;
+
 UCLASS(Blueprintable)
 class PIPPOP_API AStaticSpectatorPawn : public APawn
 {
@@ -16,19 +18,27 @@ class PIPPOP_API AStaticSpectatorPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AStaticSpectatorPawn();
+
+	FTimerHandle SpawnTimer;
 	
 private:
-
+	
+	float RespawnTime = 3.f;
+	
 	UPROPERTY()
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY()
 	TObjectPtr<UCameraComponent> MainCamera;
+
+public:
+	
+	virtual void RespawnPlayer();
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
