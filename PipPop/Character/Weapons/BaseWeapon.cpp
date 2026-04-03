@@ -115,14 +115,11 @@ FBulletTrajectory ABaseWeapon::CalculateBulletTrajectory(const FVector& Location
 	FRotator SpreadRotation = SocketRotation;
 	float SpreadMultiplier = bIsAiming ? AimingSpreadReduction : 1.f;
 	SpreadRotation.Pitch += FMath::RandRange(-SpreadAngles.DownAngle, SpreadAngles.UpAngle) * SpreadMultiplier; 
-	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle) * SpreadMultiplier;  
-	const FVector SpreadVector = SpreadRotation.Vector();
+	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle) * SpreadMultiplier; 
 	const FVector MuzzleLocation = SkeletalMeshComponent->GetSocketLocation("Muzzle");
-	const FVector Start = MuzzleLocation + SpreadVector;
-	
 	const FRotator SpreadRotator = SpreadRotation.GetEquivalentRotator();
 	const  FRotator ShotDirection = SpreadRotator;
-	return FBulletTrajectory{ ShotDirection, Start };
+	return FBulletTrajectory{ ShotDirection, MuzzleLocation };
 }
 
 void ABaseWeapon::FireProjectile()

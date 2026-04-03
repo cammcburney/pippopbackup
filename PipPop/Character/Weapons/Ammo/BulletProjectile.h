@@ -63,8 +63,6 @@ private:
 	TObjectPtr<UProjectileMovementComponent> MovementComponent;
 
 	float SpawnTime;
-
-	FVector SpawnLocation;
 	
 public:
 	

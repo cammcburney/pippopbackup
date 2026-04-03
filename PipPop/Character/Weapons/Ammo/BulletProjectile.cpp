@@ -17,8 +17,6 @@ ABulletProjectile::ABulletProjectile()
 	ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
 	SetRootComponent(ProjectileMeshComponent);
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComponent"));
-	MovementComponent->InitialSpeed = InitVelocity * 100.f;
-	MovementComponent->MaxSpeed = MaxSpeed * 100.f;
 	MovementComponent->ProjectileGravityScale = GravityScale;
 	MovementComponent->bShouldBounce = false;
 	if (BulletMesh)
@@ -34,11 +32,11 @@ ABulletProjectile::ABulletProjectile()
 // Called when the game starts or when spawned
 void ABulletProjectile::BeginPlay()
 {
-	Super::BeginPlay();
-
-	SpawnTime = GetWorld()->GetTimeSeconds();
-	SpawnLocation = GetActorLocation();
+	MovementComponent->InitialSpeed = InitVelocity * 100.f;
+	MovementComponent->MaxSpeed = MaxSpeed * 100.f;
 	MovementComponent->Velocity = GetActorForwardVector() * (InitVelocity * 100.f);
+	Super::BeginPlay();
+	SpawnTime = GetWorld()->GetTimeSeconds();
 	CurveDirection = FVector(
 		FMath::RandRange(-1.f, 1.f),
 		FMath::RandRange(-1.f, 1.f),
