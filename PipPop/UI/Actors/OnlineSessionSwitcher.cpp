@@ -48,6 +48,7 @@ void AOnlineSessionSwitcher::BeginPlay()
 
 void AOnlineSessionSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	ASwitcherBase::Interact_Implementation(InteractedComponent);
 	if (!InteractedComponent) {return;}
 	if (InteractedComponent == SessionInteractMesh)
 	{

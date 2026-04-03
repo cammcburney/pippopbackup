@@ -2,6 +2,7 @@
 
 
 #include "SwitcherBase.h"
+#include "Kismet/GameplayStatics.h"
 
 ASwitcherBase::ASwitcherBase()
 {
@@ -16,4 +17,12 @@ ASwitcherBase::ASwitcherBase()
 	TextComponent = CreateDefaultSubobject<UText3DComponent>(TEXT("TextComponent"));
 	check(TextComponent);
 	TextComponent->SetupAttachment(RootComponent);
+}
+
+void ASwitcherBase::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
+{
+	if (InteractSound)
+	{
+		UGameplayStatics::PlaySound2D(this, InteractSound, Volume, Pitch, StartTime);
+	}
 }

@@ -34,6 +34,7 @@ void ARotationSwitcher::BeginPlay()
 
 void ARotationSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	ASwitcherBase::Interact_Implementation(InteractedComponent);
 	if (Timeline && !Timeline->IsPlaying())
 	{
 		if (AMenuPawn* Player = Cast<AMenuPawn>(UGameplayStatics::GetPlayerPawn(this, 0)))

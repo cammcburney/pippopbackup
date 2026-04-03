@@ -53,6 +53,7 @@ void AOnlineSessionJoiner::Tick(float DeltaTime)
 
 void AOnlineSessionJoiner::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	ASwitcherBase::Interact_Implementation(InteractedComponent);
 	if (InteractedComponent != SessionsDisplayComponent)
 	{
 		if (bIsFindingSessions) {return;}

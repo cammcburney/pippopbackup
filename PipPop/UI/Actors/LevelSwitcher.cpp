@@ -12,6 +12,7 @@ ALevelSwitcher::ALevelSwitcher()
 
 void ALevelSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	ASwitcherBase::Interact_Implementation(InteractedComponent);
 	if (!InteractedComponent || bInteracted) {return;}
 	bInteracted = true;
 	UPipPopGameInstance* GameInst = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance());

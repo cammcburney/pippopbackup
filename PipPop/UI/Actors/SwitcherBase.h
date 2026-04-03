@@ -9,6 +9,7 @@
 #include "SwitcherBase.generated.h"
 
 class UUserWidget;
+class UGameplayStatics;
 
 UCLASS()
 class PIPPOP_API ASwitcherBase : public AActor, public ICustomisationInterface
@@ -23,5 +24,19 @@ public:
 	
 	UPROPERTY(EditInstanceOnly)
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
+	UPROPERTY(EditAnywhere, Category="Audio")
+	TObjectPtr<USoundBase> InteractSound;
+
+	UPROPERTY(EditAnywhere, Category="Audio")
+	float Volume;
+	
+	UPROPERTY(EditAnywhere, Category="Audio")
+	float Pitch;
+
+	UPROPERTY(EditAnywhere, Category="Audio")
+	float StartTime;
+	
+	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
 	
 };

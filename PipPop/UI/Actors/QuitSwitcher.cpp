@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 void AQuitSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
+	ASwitcherBase::Interact_Implementation(InteractedComponent);
 	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 	{
 		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, false);
