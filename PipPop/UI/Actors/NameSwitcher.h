@@ -34,6 +34,16 @@ public:
 	float TextSpacing = 10.f;
 
 	FString LastTextString;
+
+	UPROPERTY(EditAnywhere)
+	FSoundEffect CommitTextSoundEffect;
+
+	UPROPERTY(EditAnywhere)
+	FSoundEffect ErrorSoundEffect;
+	
+	UPROPERTY(EditAnywhere)
+	FSoundEffect SpeakingSoundEffect;
+	
 private:
 
 	bool bCaretVisible = false;

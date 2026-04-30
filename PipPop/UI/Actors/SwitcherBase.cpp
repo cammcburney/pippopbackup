@@ -21,8 +21,13 @@ ASwitcherBase::ASwitcherBase()
 
 void ASwitcherBase::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
-	if (InteractSound)
+	PlaySoundEffect(InteractSoundEffect);
+}
+
+void ASwitcherBase::PlaySoundEffect(const FSoundEffect PlayedSoundEffect)
+{
+	if (PlayedSoundEffect.Sound)
 	{
-		UGameplayStatics::PlaySound2D(this, InteractSound, Volume, Pitch, StartTime);
+		UGameplayStatics::PlaySound2D(this, PlayedSoundEffect.Sound, PlayedSoundEffect.Volume, PlayedSoundEffect.Pitch, PlayedSoundEffect.StartTime);
 	}
 }

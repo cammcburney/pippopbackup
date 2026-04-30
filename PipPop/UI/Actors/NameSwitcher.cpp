@@ -46,6 +46,11 @@ void ANameSwitcher::BeginPlay()
 			TextComponent->SetText(FText::FromString(NewPlayerName));
 		}
 		LastTextString = NewPlayerName;
+		if (Caret)
+		{
+			const FVector CaretLocation = Caret->GetComponentLocation();
+			Caret->SetRelativeLocation(CaretLocation - FVector( 0, TextSpacing * LastTextString.Len(), 0));
+		}
 	}
 }
 
@@ -81,6 +86,10 @@ void ANameSwitcher::PlayerNameTextUpdated(const FText& NewText)
 	{
 		const FString CurrentText = CustomTextWidget->EditableTextBox->GetText().ToString();
 		CustomTextWidget->EditableTextBox->SetText(FText::FromString(CurrentText.Left(MaxStringLength)));
+		if (ErrorSoundEffect.Sound)
+		{
+			PlaySoundEffect(ErrorSoundEffect);
+		}
 		return;
 	}
 	if (TextComponent)
@@ -98,6 +107,13 @@ void ANameSwitcher::PlayerNameTextUpdated(const FText& NewText)
 			{
 				Caret->SetRelativeLocation(CaretLocation - FVector( 0, TextSpacing, 0));
 			}
+		}
+		if (SpeakingSoundEffect.Sound)
+		{
+			SpeakingSoundEffect.Volume = FMath::RandRange(.8f, 1.2f);
+			SpeakingSoundEffect.Pitch = FMath::RandRange(-1.f, 2.f);
+			SpeakingSoundEffect.StartTime = FMath::RandRange(0.f, .2f);
+			PlaySoundEffect(SpeakingSoundEffect);
 		}
 	}
 	LastTextString = NewText.ToString();
@@ -124,4 +140,8 @@ void ANameSwitcher::PlayerNameTextCommitted(const FText& Text, ETextCommit::Type
 		}
 	}
 	HideCaret();
+	if (CommitTextSoundEffect.Sound)
+	{
+		PlaySoundEffect(CommitTextSoundEffect);
+	}
 }
