@@ -14,6 +14,7 @@ class UCameraComponent;
 class UCombatComponent;
 class ABaseWeapon;
 class UPipPopMovementComponent;
+class UKismetMathLibrary;
 
 UCLASS(Blueprintable)
 class PIPPOP_API AShooterPlayerCharacter : public ACharacter
@@ -29,7 +30,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
-	
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -70,6 +70,8 @@ private:
 	UPROPERTY(Replicated)
 	TObjectPtr<ABaseWeapon> EquippedWeapon;
 
+	FVector GravityCenter = FVector::ZeroVector;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -83,6 +85,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	UCombatComponent* GetCombatComponent() {return CombatComponent;}
+
+	FVector GetGravityCenter() const {return GravityCenter;}
+
+	void SetGravityCenter(const FVector& NewGravityCenter) {GravityCenter = NewGravityCenter;}
 	
 	void SetupInputMapping();
 	

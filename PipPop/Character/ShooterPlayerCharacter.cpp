@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Components/PipPopMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Pawns/Spectator/StaticSpectatorPawn.h"
 #include "Weapons/BaseWeapon.h"
@@ -41,9 +42,6 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	GetCharacterMovement()->JumpZVelocity = 850.f;
 	GetCharacterMovement()->GravityScale = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 1200.f;
-	
-	
-	
 }
 
 // Called when the game starts or when spawned
@@ -58,12 +56,10 @@ void AShooterPlayerCharacter::BeginPlay()
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Instigator = this;
 			SpawnParameters.Owner = this;
-			if (ABaseWeapon* Weapon = World->SpawnActor<ABaseWeapon>(PrimaryWeaponClass, GetActorLocation() + FVector(150, 0, 50), FRotator::ZeroRotator, SpawnParameters))
+			if (ABaseWeapon* Weapon = World->SpawnActor<ABaseWeapon>(PrimaryWeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
 			{
 				EquippedWeapon = Weapon;
-				Weapon->AttachToComponent(FirstPersonCameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-				Weapon->SetActorRelativeLocation(FVector(100, 0, 0));
-				Weapon->SetActorRelativeRotation(FRotator(0, -90.f, 0));
+				Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Hand"));
 			}
 		}
 	}
@@ -73,6 +69,21 @@ void AShooterPlayerCharacter::BeginPlay()
 void AShooterPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (!GravityCenter.IsNearlyZero())
+	{
+		if (UPipPopMovementComponent* MovementComponent = Cast<UPipPopMovementComponent>(GetCharacterMovement()))
+		{
+			// FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), GravityCenter);
+			// MovementComponent->SetGravityDirection(LookRotation.Vector());
+			const FVector GravityDirection = -(GetActorLocation() - GravityCenter).GetSafeNormal();
+			MovementComponent->SetGravityDirection(GravityDirection);
+			
+			FVector ProjectedForward = FVector::VectorPlaneProject(GetActorForwardVector(), -GravityDirection).GetSafeNormal();
+			FQuat TargetRotation = FRotationMatrix::MakeFromXZ(-GravityDirection, ProjectedForward).ToQuat();
+			FQuat FinalRotation = FQuat::Slerp(GetActorQuat(), TargetRotation, FMath::Clamp(DeltaTime * 8.f, 0.f, 1.f));
+			SetActorRotation(FinalRotation);
+		}
+	}
 }
 
 void AShooterPlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -129,12 +140,18 @@ void AShooterPlayerCharacter::SetupInputMapping()
 void AShooterPlayerCharacter::PlayerMove(const FInputActionValue& Value)
 {
 	const FVector2D MovementValue = Value.Get<FVector2D>();
-	if (Controller)
+	if (UPipPopMovementComponent* MovementComponent = Cast<UPipPopMovementComponent>(GetMovementComponent()))
 	{
-		const FVector Right = GetActorRightVector();
-		AddMovementInput(Right, MovementValue.X);
-		const FVector Forward = GetActorForwardVector();
-		AddMovementInput(Forward, MovementValue.Y);
+		if (Controller && FirstPersonCameraComponent)
+		{
+			const FVector GravityDirection = MovementComponent->GetGravityDirection();
+			const FVector CameraRightDirection = FirstPersonCameraComponent->GetRightVector();
+			const FVector Right = CameraRightDirection - GravityDirection * FVector::DotProduct(GravityDirection, CameraRightDirection);
+			AddMovementInput(Right.GetSafeNormal(), MovementValue.X);
+			const FVector CameraForwardDirection = FirstPersonCameraComponent->GetForwardVector();
+			const FVector Forward = CameraForwardDirection - GravityDirection * FVector::DotProduct(GravityDirection, CameraForwardDirection);
+			AddMovementInput(Forward, MovementValue.Y);
+		}
 	}
 }
 
