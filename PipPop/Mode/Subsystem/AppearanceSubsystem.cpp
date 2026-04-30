@@ -37,12 +37,3 @@ int32 UAppearanceSubsystem::GetSectionLength(const FName RowName, EAppearanceTyp
 	}
 	return 0;
 }
-
-FName UAppearanceSubsystem::GetSectionName(const FName RowName) const
-{
-	if (const FAppearanceInfo* AppearanceRow = AppearanceTable->FindRow<FAppearanceInfo>(RowName, ""))
-	{
-		return AppearanceRow->SectionName;
-	}
-	return FName();
-}

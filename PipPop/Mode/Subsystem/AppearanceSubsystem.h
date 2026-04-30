@@ -35,8 +35,6 @@ public:
 	UAppearanceSubsystem();
 
 	int32 GetSectionLength(FName RowName, EAppearanceType AppearanceType) const;
-
-	FName GetSectionName(FName RowName) const;
 	
 	template<typename AppearanceItem>
 	AppearanceItem* LoadAppearanceAsset(const FName RowName, int32 Index, TArray<TObjectPtr<AppearanceItem>> FAppearanceInfo::*Member);

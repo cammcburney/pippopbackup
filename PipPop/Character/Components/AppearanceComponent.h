@@ -4,25 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/AppearanceStructs.h"
 #include "AppearanceComponent.generated.h"
 
 class USkeletalMeshComponent;
 
-UENUM(BlueprintType)
-enum class EAppearance : uint8
-{
-	Head UMETA(DisplayName = "Head"),
-	Ears UMETA(DisplayName = "Ears"),
-	LeftEye UMETA(DisplayName = "LeftEye"),
-	RightEye UMETA(DisplayName = "RightEye"),
-	Mouth UMETA(DisplayName = "Mouth"),
-	Torso UMETA(DisplayName = "Torso"),
-	Legs UMETA(DisplayName = "Legs"),
-	Tail UMETA(DisplayName = "Tail"),
-	Accessory UMETA(DisplayName = "Accessory")
-};
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PIPPOP_API UAppearanceComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -32,10 +19,10 @@ public:
 	UAppearanceComponent();
 	
 	TMap<EAppearance, USkeletalMeshComponent*> GetAppearanceMap() {return AppearanceComponents;}
-	
+
 protected:
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Appearance")
 	TMap<EAppearance, USkeletalMeshComponent*> AppearanceComponents;
 	
 	// Called when the game starts
@@ -45,7 +32,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	static FName GetSectionName(EAppearance AppearanceEnum) {return FName(*FString::FromInt(static_cast<int32>(AppearanceEnum)));}
-
 	USkeletalMeshComponent* GetSkeletalMeshComponent(const EAppearance Section) const {if (AppearanceComponents.Contains(Section)) {return AppearanceComponents[Section];} return nullptr;}
+
+	void SetAppearanceMesh(const EAppearance Appearance, USkeletalMesh* NewMesh);
+
+	void SetAppearanceMaterial (const EAppearance Appearance, UMaterialInterface* NewMaterial);
 };

@@ -35,9 +35,10 @@ void AAppearanceSwitcher::BeginPlay()
 {
 	Super::BeginPlay();
 	UAppearanceSubsystem* Subsystem = GetAppearanceSubsystem();
-	if (Subsystem && !AppearanceSection.IsNone())
+	const FName SectionName = AppearanceUtils::GetSectionName(AppearanceCategory);
+	if (Subsystem && !SectionName.IsNone())
 	{
-		MaxIndex = Subsystem->GetSectionLength(AppearanceSection, AppearanceType);
+		MaxIndex = Subsystem->GetSectionLength(SectionName, AppearanceType);
 	}
 	SetupActor();
 }
@@ -67,7 +68,6 @@ ACustomisationPawn* AAppearanceSwitcher::GetPlayer() const
 void AAppearanceSwitcher::Interact_Implementation(UPrimitiveComponent* InteractedComponent)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, TEXT("CHANGE SOMETHING"));
-	UAppearanceSubsystem* Subsystem = GetAppearanceSubsystem();
 	int32 IterateBy = 0;
 	for (int32 i = 0; i < StaticMeshComponents.Num(); i++)
 	{
@@ -84,21 +84,27 @@ void AAppearanceSwitcher::Interact_Implementation(UPrimitiveComponent* Interacte
 		if (const UAppearanceComponent* Appearance = Pawn->GetAppearance())
 		{
 			USkeletalMeshComponent* SkeletalMeshComponent = Appearance->GetSkeletalMeshComponent(AppearanceCategory);
+			UPipPopGameInstance* GameInst = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance());
+			if (!GameInst) {return;}
+			FPlayerSaveData PlayerSaveData = GameInst->LoadPlayerSaveData();
 			switch (AppearanceType)
 			{
 			case EAppearanceType::Mesh:
 				{
-					USkeletalMesh* Mesh = GetMeshAsset(Subsystem);
+					USkeletalMesh* Mesh = GetMeshAsset();
 					SkeletalMeshComponent->SetSkeletalMesh(Mesh);
+					PlayerSaveData.SetAppearanceMesh(AppearanceCategory, Index);
 					break;
 				}
 			case EAppearanceType::Material:
 				{
-					UMaterialInterface* Material = GetMaterialAsset(Subsystem);
-					SkeletalMeshComponent->SetMaterial(0, Material);
+					UMaterialInterface* Material = GetMaterialAsset();
+					SkeletalMeshComponent->SetMaterial(MaterialIndex, Material);
+					PlayerSaveData.SetAppearanceMaterial(AppearanceCategory, Index);
 					break;
 				}
 			}
+			GameInst->SetPlayerSaveData(PlayerSaveData);
 		}
 	}
 }
@@ -117,16 +123,20 @@ int32 AAppearanceSwitcher::GetNextValidIndex(const int IterateBy) const
 	return NextIndex;
 }
 
-USkeletalMesh* AAppearanceSwitcher::GetMeshAsset(UAppearanceSubsystem* AppearanceSubsystem) const
+USkeletalMesh* AAppearanceSwitcher::GetMeshAsset() const
 {
-	if (!AppearanceSubsystem) {return nullptr;}
-	return AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Mesh);
+	UAppearanceSubsystem* Subsystem = GetAppearanceSubsystem();
+	if (!Subsystem) {return nullptr;}
+	const FName SectionName = AppearanceUtils::GetSectionName(AppearanceCategory);
+	return Subsystem->LoadAppearanceAsset(SectionName, Index, &FAppearanceInfo::Mesh);
 }
 
-UMaterialInterface* AAppearanceSwitcher::GetMaterialAsset(UAppearanceSubsystem* AppearanceSubsystem) const
+UMaterialInterface* AAppearanceSwitcher::GetMaterialAsset() const
 {
-	if (!AppearanceSubsystem) {return nullptr;}
-	return AppearanceSubsystem->LoadAppearanceAsset(AppearanceSection, Index, &FAppearanceInfo::Material);
+	UAppearanceSubsystem* Subsystem = GetAppearanceSubsystem();
+	if (!Subsystem) {return nullptr;}
+	const FName SectionName = AppearanceUtils::GetSectionName(AppearanceCategory);
+	return Subsystem->LoadAppearanceAsset(SectionName, Index, &FAppearanceInfo::Material);
 }
 
 void AAppearanceSwitcher::SetupActor()
@@ -135,6 +145,7 @@ void AAppearanceSwitcher::SetupActor()
 	{
 		for (int32 i = 0; i < StaticMeshComponents.Num(); i++)
 		{
+			if (!StaticMeshComponents.IsValidIndex(i)) {return;}
 			if (UStaticMeshComponent* Component = StaticMeshComponents[i])
 			{
 				Component->SetStaticMesh(StaticMesh);

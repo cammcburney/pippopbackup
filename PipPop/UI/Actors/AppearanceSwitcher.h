@@ -34,13 +34,13 @@ public:
 	EAppearance AppearanceCategory;
 	
 	UPROPERTY(EditAnywhere)
-	FName AppearanceSection;
-	
-	UPROPERTY(EditAnywhere)
 	UStaticMesh* StaticMesh;
 
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* MeshMaterial;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaterialIndex;
 	
 private:
 
@@ -60,9 +60,9 @@ public:
 	
 	UAppearanceSubsystem* GetAppearanceSubsystem() const;
 	
-	USkeletalMesh* GetMeshAsset(UAppearanceSubsystem* AppearanceSubsystem) const;
+	USkeletalMesh* GetMeshAsset() const;
 	
-	UMaterialInterface* GetMaterialAsset(UAppearanceSubsystem* AppearanceSubsystem) const;
+	UMaterialInterface* GetMaterialAsset() const;
 	
 	ACustomisationPawn* GetPlayer() const;
 	

@@ -14,39 +14,43 @@ UAppearanceComponent::UAppearanceComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	if (USkeletalMeshComponent* Head = CreateDefaultSubobject<USkeletalMeshComponent>("HeadMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Head, Head);
+		AppearanceComponents.Add(EAppearance::HEAD, Head);
 	}
 	if (USkeletalMeshComponent* Ears = CreateDefaultSubobject<USkeletalMeshComponent>("EarsMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Ears, Ears);
+		AppearanceComponents.Add(EAppearance::EARS, Ears);
 	}
-	if (USkeletalMeshComponent* LeftEye = CreateDefaultSubobject<USkeletalMeshComponent>("LeftEyeMesh"))
+	if (USkeletalMeshComponent* Eyes = CreateDefaultSubobject<USkeletalMeshComponent>("EyesMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::LeftEye, LeftEye);
-	}
-	if (USkeletalMeshComponent* RightEye = CreateDefaultSubobject<USkeletalMeshComponent>("RightEyeMesh"))
-	{
-		AppearanceComponents.Add(EAppearance::RightEye, RightEye);
+		AppearanceComponents.Add(EAppearance::EYES, Eyes);
 	}
 	if (USkeletalMeshComponent* Mouth = CreateDefaultSubobject<USkeletalMeshComponent>("MouthMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Mouth, Mouth);
+		AppearanceComponents.Add(EAppearance::MOUTH, Mouth);
 	}
 	if (USkeletalMeshComponent* Torso = CreateDefaultSubobject<USkeletalMeshComponent>("TorsoMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Torso, Torso);
+		AppearanceComponents.Add(EAppearance::TORSO, Torso);
 	}
 	if (USkeletalMeshComponent* Tail = CreateDefaultSubobject<USkeletalMeshComponent>("TailMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Tail, Tail);
+		AppearanceComponents.Add(EAppearance::TAIL, Tail);
 	}
 	if (USkeletalMeshComponent* Legs = CreateDefaultSubobject<USkeletalMeshComponent>("LegsMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Legs, Legs);
+		AppearanceComponents.Add(EAppearance::LEGS, Legs);
 	}
-	if (USkeletalMeshComponent* Accessory = CreateDefaultSubobject<USkeletalMeshComponent>("AccessoryMesh"))
+	if (USkeletalMeshComponent* Hat = CreateDefaultSubobject<USkeletalMeshComponent>("HatMesh"))
 	{
-		AppearanceComponents.Add(EAppearance::Accessory, Accessory);
+		AppearanceComponents.Add(EAppearance::HAT, Hat);
+	}
+	if (USkeletalMeshComponent* Accessory1 = CreateDefaultSubobject<USkeletalMeshComponent>("AccessoryMesh1"))
+	{
+		AppearanceComponents.Add(EAppearance::ACCESSORY_1, Accessory1);
+	}
+	if (USkeletalMeshComponent* Accessory2 = CreateDefaultSubobject<USkeletalMeshComponent>("AccessoryMesh2"))
+	{
+		AppearanceComponents.Add(EAppearance::ACCESSORY_2, Accessory2);
 	}
 }
 
@@ -55,24 +59,25 @@ UAppearanceComponent::UAppearanceComponent()
 void UAppearanceComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (!GetWorld()) {return;}
 	UPipPopGameInstance* GameInst = Cast<UPipPopGameInstance>(GetWorld()->GetGameInstance());
 	if (!GameInst) {return;}
+	FPlayerSaveData PlayerSaveData = GameInst->LoadPlayerSaveData();
 	UAppearanceSubsystem* AppearanceSubsystem = GameInst->GetSubsystem<UAppearanceSubsystem>();
 	if (!AppearanceSubsystem) {return;}
-	for (const auto& AppearanceElem : AppearanceComponents)
+	for (EAppearance Appearance : TEnumRange<EAppearance>())
 	{
-		const FName SectionName = GetSectionName(AppearanceElem.Key);
-		if (USkeletalMesh* AppearanceItem = AppearanceSubsystem->LoadAppearanceAsset(SectionName, 0, &FAppearanceInfo::Mesh))
+		const FName RowName = AppearanceUtils::GetSectionName(Appearance);
+		const int32 MeshIndex = PlayerSaveData.GetMeshIndex(Appearance);
+		const int32 MaterialIndex = PlayerSaveData.GetMaterialIndex(Appearance);
+		if (USkeletalMesh* AppearanceItem = AppearanceSubsystem->LoadAppearanceAsset(RowName, MeshIndex, &FAppearanceInfo::Mesh))
 		{
-			AppearanceElem.Value->SetSkeletalMesh(AppearanceItem);
-			AppearanceElem.Value->SetupAttachment(GetOwner()->GetRootComponent());
-			AppearanceElem.Value->RegisterComponent();
-			if (UMaterialInterface* MaterialItem = AppearanceSubsystem->LoadAppearanceAsset(SectionName, 0, &FAppearanceInfo::Material))
-			{
-				AppearanceElem.Value->SetMaterial(0, MaterialItem);
-			}
+			SetAppearanceMesh(Appearance, AppearanceItem);
+		}
+		if (UMaterialInterface* MaterialItem = AppearanceSubsystem->LoadAppearanceAsset(RowName, MaterialIndex, &FAppearanceInfo::Material))
+		{
+			SetAppearanceMaterial(Appearance, MaterialItem);
 		}
 	}
 }
@@ -82,8 +87,6 @@ void UAppearanceComponent::BeginPlay()
 void UAppearanceComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 	for (const auto& AppearanceElem : AppearanceComponents)
 	{
 		if (USkeletalMeshComponent* AppearanceItem = AppearanceElem.Value)
@@ -94,6 +97,22 @@ void UAppearanceComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 				AppearanceElem.Value->SetWorldRotation(Rotation + FRotator(0,.3f,0));
 			}
 		}
+	}
+}
+
+void UAppearanceComponent::SetAppearanceMesh(const EAppearance Appearance, USkeletalMesh* NewMesh)
+{
+	if (AppearanceComponents.Contains(Appearance))
+	{
+		AppearanceComponents[Appearance]->SetSkeletalMesh(NewMesh);
+	}
+}
+
+void UAppearanceComponent::SetAppearanceMaterial(const EAppearance Appearance, UMaterialInterface* NewMaterial)
+{
+	if (AppearanceComponents.Contains(Appearance))
+	{
+		AppearanceComponents[Appearance]->SetMaterial(0, NewMaterial);
 	}
 }
 
