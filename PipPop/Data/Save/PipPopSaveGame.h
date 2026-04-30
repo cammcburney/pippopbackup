@@ -26,17 +26,9 @@ public:
 	void SetPlayerSaveData(const TMap<FGuid, FPlayerSaveData>& NewPlayerSaveData);
 
 	TMap<FGuid, FPlayerSaveData> GetPlayerSaveData() const;
-	
-// private:
 
 	UPROPERTY()
 	FGuid PlayerID;
-	
-	UPROPERTY()
-	TArray<int32> CharacterMeshes;
-	
-	UPROPERTY()
-	TArray<int32> CharacterMaterials;
 
 	UPROPERTY()
 	TMap<FGuid, FPlayerSaveData> PlayerSave;

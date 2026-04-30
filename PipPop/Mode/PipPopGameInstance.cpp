@@ -57,8 +57,7 @@ void UPipPopGameInstance::SetPlayerSaveData(const FPlayerSaveData& PlayerData)
 		TMap<FGuid, FPlayerSaveData> CurrentPlayerSaveData = SaveGameObject->GetPlayerSaveData();
 		if (CurrentPlayerSaveData.Contains(PlayerID))
 		{
-			FPlayerSaveData& ExistingData = CurrentPlayerSaveData[PlayerID];
-			ExistingData.SetPlayerName(PlayerData.GetPlayerName());
+			CurrentPlayerSaveData.Add(PlayerID, PlayerData);
 		}
 		else
 		{
