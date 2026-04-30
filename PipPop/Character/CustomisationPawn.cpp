@@ -16,19 +16,16 @@ ACustomisationPawn::ACustomisationPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	AppearanceComponent = CreateDefaultSubobject<UAppearanceComponent>("AppearanceComponent");
+	check(AppearanceComponent);
+	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
-	if (SpringArm)
-	{
-		SpringArm->SetupAttachment(RootComponent);
-		SpringArm->TargetArmLength = 350.f;
-	}
+	check(SpringArm);
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 350.f;
+	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
-	if (CameraComponent)
-	{
-		CameraComponent->SetupAttachment(SpringArm);
-		CameraComponent->SetRelativeRotation(FRotator(0, -180.f, 0));
-	}
-
+	check(CameraComponent);
+	CameraComponent->SetupAttachment(SpringArm);
 }
 
 // Called when the game starts or when spawned

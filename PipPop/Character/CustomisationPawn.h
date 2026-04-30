@@ -28,16 +28,17 @@ UCLASS()
 class PIPPOP_API ACustomisationPawn : public APawn
 {
 	GENERATED_BODY()
-
+public:
+	
 	UPROPERTY(EditDefaultsOnly)
 	FInputActions InputActions;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UInputMappingContext> InputMappingContext;
-	
-	UPROPERTY()
-	TObjectPtr<UAppearanceComponent> AppearanceComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UAppearanceComponent> AppearanceComponent;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
 	
