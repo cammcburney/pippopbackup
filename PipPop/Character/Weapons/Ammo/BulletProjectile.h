@@ -3,10 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/Weapons/BaseWeapon.h"
 #include "GameFramework/Actor.h"
 #include "BulletProjectile.generated.h"
 
+class ABaseWeapon;
 class UProjectileMovementComponent;
+class UNiagaraComponent;
+class UNiagaraFunctionLibrary;
+class UNiagaraSystem;
 
 UCLASS(Blueprintable)
 class PIPPOP_API ABulletProjectile : public AActor
@@ -19,10 +24,22 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMesh> BulletMesh;
-
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> BulletMaterial;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> ProjectileNiagaraSystem;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraComponent> NiagaraComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> BulletSound;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAudioComponent> BulletAudioComponent;
+	
 	UPROPERTY(EditAnywhere, Replicated)
 	float Damage = 10;
 
@@ -53,24 +70,32 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCurveFloat> BulletCurve;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UStaticMeshComponent> ProjectileMeshComponent;
 
 private:
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UStaticMeshComponent> ProjectileMeshComponent;
 	
 	UPROPERTY()
 	TObjectPtr<UProjectileMovementComponent> MovementComponent;
-
+	
 	float SpawnTime;
 	
 public:
 	
 	UFUNCTION()
 	virtual void ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	
-protected:
 
+	UFUNCTION()
+	virtual void TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory);
+
+	UFUNCTION()
+	virtual void SpawnBulletSound();
+
+	UFUNCTION()
+	virtual void DestroyProjectile();
+protected:
+	
 	virtual void BeginPlay() override;
 
 public:	

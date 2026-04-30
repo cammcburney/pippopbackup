@@ -11,9 +11,11 @@ ABaseWeapon::ABaseWeapon()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	check(SkeletalMeshComponent);
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
+	
 	SightsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SightsCamera"));
 	check(SightsCamera);
 	SightsCamera->SetupAttachment(SkeletalMeshComponent, FName("Sights"));
@@ -134,6 +136,11 @@ void ABaseWeapon::FireProjectile()
 		SpawnParameters.Owner = this;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParameters.TransformScaleMethod = ESpawnActorScaleMethod::OverrideRootScale;
-		World->SpawnActor<ABulletProjectile>(ProjectileClass, BulletTrajectory.Start, BulletTrajectory.ShotDirection, SpawnParameters);
+		if (ABulletProjectile* Bullet = World->SpawnActor<ABulletProjectile>(ProjectileClass, BulletTrajectory.Start, BulletTrajectory.ShotDirection, SpawnParameters))
+		{
+			Bullet->TriggerNiagaraSystem(this, BulletTrajectory);
+		}
+		
 	}
 }
+

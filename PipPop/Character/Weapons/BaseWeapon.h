@@ -44,10 +44,10 @@ class PIPPOP_API ABaseWeapon : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
-
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletProjectile> ProjectileClass;
-
+	
 	UPROPERTY(EditAnywhere)
 	bool bIsAutomatic;
 
@@ -63,7 +63,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> SightsCamera;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -71,6 +71,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float AimingSpreadReduction = .7f;
+	
 private:
 
 	bool bFiring = false;
@@ -86,7 +87,7 @@ private:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

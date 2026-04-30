@@ -7,6 +7,12 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "Character/Weapons/BaseWeapon.h"
+#include "Components/AudioComponent.h"
+
 
 // Sets default values
 ABulletProjectile::ABulletProjectile()
@@ -15,10 +21,14 @@ ABulletProjectile::ABulletProjectile()
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	ProjectileMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMeshComponent"));
+	check(ProjectileMeshComponent)
 	SetRootComponent(ProjectileMeshComponent);
+	
 	MovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("MovementComponent"));
+	check(MovementComponent)
 	MovementComponent->ProjectileGravityScale = GravityScale;
 	MovementComponent->bShouldBounce = false;
+	
 	if (BulletMesh)
 	{
 		ProjectileMeshComponent->SetStaticMesh(BulletMesh);
@@ -27,6 +37,14 @@ ABulletProjectile::ABulletProjectile()
 			ProjectileMeshComponent->SetMaterial(0, BulletMaterial);
 		}
 	}
+
+	ProjectileNiagaraSystem = CreateDefaultSubobject<UNiagaraSystem>(TEXT("ProjectileNiagaraSystem"));
+	check(ProjectileNiagaraSystem);
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BeamComponent"));
+	check(NiagaraComponent);
+
+	BulletSound = CreateDefaultSubobject<USoundBase>(TEXT("BulletSound"));
 }
 
 // Called when the game starts or when spawned
@@ -56,6 +74,7 @@ void ABulletProjectile::BeginPlay()
 	}
 	ProjectileMeshComponent->OnComponentHit.AddDynamic(this, &ABulletProjectile::ProjectileHit);
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &ABulletProjectile::DestroyParticle, Lifetime, false);
+	SpawnBulletSound();
 }
 
 void ABulletProjectile::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -68,7 +87,7 @@ void ABulletProjectile::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 void ABulletProjectile::Tick(float DeltaTime)
 {	
 	Super::Tick(DeltaTime);
-	AddActorLocalRotation(FRotator(0, 0, 360) * DeltaTime);
+	// AddActorLocalRotation(FRotator(0, 0, 360) * DeltaTime);
 	if (MovementComponent)
 	{
 		const float LifetimePercent = FMath::Clamp((GetWorld()->GetTimeSeconds() - SpawnTime) / Lifetime, 0.f, 1.f);
@@ -79,7 +98,6 @@ void ABulletProjectile::Tick(float DeltaTime)
 		}
 		MovementComponent->Velocity += CurveDirection.GetSafeNormal() * (CurveMaxStrength * 100) * CurveIntensity * DeltaTime;
 	}
-	
 }
 
 void ABulletProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -98,12 +116,52 @@ void ABulletProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor*
 	
 }
 
-void ABulletProjectile::DestroyParticle()
+void ABulletProjectile::TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory)
 {
-	if (HasAuthority())
-	{
-		Destroy();
-	}
-	GetWorld()->GetTimerManager().ClearTimer(DestroyTimer);
 }
 
+void ABulletProjectile::SpawnBulletSound()
+{
+	if (BulletSound)
+	{
+		USoundAttenuation* SoundAttenuation = NewObject<USoundAttenuation>(this);
+		SoundAttenuation->Attenuation.bSpatialize = true;
+		SoundAttenuation->Attenuation.bAttenuate = true;
+		SoundAttenuation->Attenuation.AttenuationShape = EAttenuationShape::Sphere;
+		SoundAttenuation->Attenuation.AttenuationShapeExtents = FVector(300.f);
+		SoundAttenuation->Attenuation.FalloffDistance = 15000.f;
+		SoundAttenuation->Attenuation.dBAttenuationAtMax = -80.f;
+		SoundAttenuation->Attenuation.DistanceAlgorithm = EAttenuationDistanceModel::Logarithmic;
+		BulletAudioComponent = UGameplayStatics::SpawnSoundAttached(
+			BulletSound,
+			ProjectileMeshComponent,
+			NAME_None,
+			FVector::ZeroVector,
+			EAttachLocation::KeepRelativeOffset,
+			true,
+			1.f,
+			1.f,
+			0.f,
+			SoundAttenuation);
+	}
+}
+
+void ABulletProjectile::DestroyParticle()
+{
+	if (BulletAudioComponent)
+	{
+		BulletAudioComponent->FadeOut(.5f, 0.f, EAudioFaderCurve::Linear);
+	}
+	if (HasAuthority())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(DestroyTimer);
+	}
+	ProjectileMeshComponent->DestroyComponent();
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &ABulletProjectile::DestroyProjectile, 1.f, false);
+}
+
+void ABulletProjectile::DestroyProjectile()
+{
+	Destroy();
+}
