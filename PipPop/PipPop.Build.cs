@@ -25,7 +25,8 @@ public class PipPop : ModuleRules
 			"OnlineSubsystemSteam",
 			"OnlineSubsystemUtils",
 			"MediaAssets",
-			"MediaUtils"
+			"MediaUtils",
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "OnlineSubsystem" });
