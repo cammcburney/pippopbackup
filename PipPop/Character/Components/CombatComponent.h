@@ -16,6 +16,8 @@ public:
 	// Sets default values for this component's properties
 	UCombatComponent();
 
+	/* Health Management */
+	
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	int32 Health = 500;
 
@@ -27,7 +29,11 @@ public:
 	virtual bool TakeDamage_Validate(const float Damage);
 
 	UFUNCTION(BlueprintCallable)
-	float GetHealth() {return Health;}	
+	float GetHealth() {return Health;}
+
+	/* Weapon Management */
+
+	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
