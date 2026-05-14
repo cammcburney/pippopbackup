@@ -25,6 +25,9 @@ public:
 
 	UPROPERTY(EditInstanceOnly)
 	float RotationTurn = 90.f;
+
+	UPROPERTY(EditInstanceOnly)
+	float TimelineLength = 4.f;
 	
 private:
 

@@ -27,7 +27,7 @@ void ARotationSwitcher::BeginPlay()
 			Curve->FloatCurve.UpdateOrAddKey(1.f, RotationTurn);
 			Timeline->AddInterpFloat(Curve, TimelineProgress, FName("TimelineProgress"));
 		}
-		Timeline->SetTimelineLength(4.f);
+		Timeline->SetTimelineLength(TimelineLength);
 		Timeline->SetTimelineFinishedFunc(TimelineComplete);
 	}
 }
