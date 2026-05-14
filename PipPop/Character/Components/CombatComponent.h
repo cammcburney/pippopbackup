@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/WeaponStructs.h"
 #include "Components/ActorComponent.h"
 #include "CombatComponent.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PIPPOP_API UCombatComponent : public UActorComponent
@@ -33,6 +33,10 @@ public:
 
 	/* Weapon Management */
 
+	UPROPERTY(Replicated)
+	FEquippedWeapons EquippedWeapons;
+	
+	ABaseWeapon* SpawnWeapon(const TSubclassOf<ABaseWeapon> WeaponClass, ACharacter* Owner);
 	
 protected:
 	// Called when the game starts

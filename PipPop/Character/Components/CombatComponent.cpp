@@ -2,7 +2,6 @@
 
 
 #include "Character/Components/CombatComponent.h"
-
 #include "Character/ShooterPlayerCharacter.h"
 #include "Net/UnrealNetwork.h"
 
@@ -18,6 +17,22 @@ UCombatComponent::UCombatComponent()
 	// ...
 }
 
+
+ABaseWeapon* UCombatComponent::SpawnWeapon(const TSubclassOf<ABaseWeapon> WeaponClass, ACharacter* Owner)
+{
+	if (Owner && WeaponClass)
+	{
+		FVector SpawnLocation = Owner->GetActorLocation();
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = Owner;
+		SpawnParameters.Instigator = Owner;
+		if (ABaseWeapon* Weapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters))
+		{
+			return Weapon;
+		}
+	}
+	return nullptr;
+}
 
 // Called when the game starts
 void UCombatComponent::BeginPlay()
@@ -41,6 +56,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCombatComponent, Health)
+	DOREPLIFETIME(UCombatComponent, EquippedWeapons)
 }
 
 void UCombatComponent::TakeDamage_Implementation(const float Damage)
