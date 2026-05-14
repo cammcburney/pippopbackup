@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/AppearanceComponent.h"
 #include "Components/PipPopMovementComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -37,6 +38,8 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	FirstPersonCameraComponent->FirstPersonScale = 0.6;
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	check(CombatComponent);
+	AppearanceComponent = CreateDefaultSubobject<UAppearanceComponent>(TEXT("AppearanceComponent"));
+	check(AppearanceComponent);
 	PrimaryWeapon = CreateDefaultSubobject<ABaseWeapon>(TEXT("PrimaryWeaponClass"));
 	check(PrimaryWeapon)
 	GetCharacterMovement()->JumpZVelocity = 850.f;
@@ -59,7 +62,18 @@ void AShooterPlayerCharacter::BeginPlay()
 			if (ABaseWeapon* Weapon = World->SpawnActor<ABaseWeapon>(PrimaryWeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
 			{
 				EquippedWeapon = Weapon;
-				Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Hand"));
+				EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Hand"));
+			}
+		}
+	}
+	if (AppearanceComponent)
+	{
+		for (const EAppearance ComponentType : {EAppearance::HEAD,EAppearance::EYES,EAppearance::MOUTH,EAppearance::LEGS,EAppearance::TAIL,EAppearance::EARS,EAppearance::TORSO})
+		{
+			if (USkeletalMeshComponent* BodyComponent = AppearanceComponent->GetSkeletalMeshComponent(ComponentType))
+			{
+				BodyComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale);
+				BodyComponent->SetLeaderPoseComponent(GetMesh());
 			}
 		}
 	}

@@ -14,6 +14,7 @@ class UCameraComponent;
 class UCombatComponent;
 class ABaseWeapon;
 class UPipPopMovementComponent;
+class UAppearanceComponent;
 class UKismetMathLibrary;
 
 UCLASS(Blueprintable)
@@ -59,9 +60,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> SlideAction;
 	
-	UPROPERTY(EditAnywhere, Replicated, Category = Input, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly)
 	TObjectPtr<UCombatComponent> CombatComponent;
-	
+
+	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly)
+	TObjectPtr<UAppearanceComponent> AppearanceComponent;
 private:
 
 	UPROPERTY()
