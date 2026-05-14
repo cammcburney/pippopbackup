@@ -27,5 +27,5 @@ enum class EWeaponTypes : uint8
 {
 	CORE = 0 UMETA(DisplayName = "Core"),
 	SPECIAL = 1 UMETA(DisplayName = "Special"),
-	GRENADE = 2 UMETA(DisplayName = "Grenade")
+	TACTICAL = 2 UMETA(DisplayName = "Tactical")
 };
