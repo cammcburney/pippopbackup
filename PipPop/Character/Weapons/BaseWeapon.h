@@ -90,6 +90,12 @@ protected:
 	
 public:	
 	// Called every frame
+	UFUNCTION(BlueprintCallable)
+	bool IsAiming() const {return bIsAiming;}
+
+	UFUNCTION(BlueprintCallable)
+	bool IsFiring() const {return bFiring;}
+	
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(Server, Reliable, WithValidation)

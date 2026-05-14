@@ -15,6 +15,7 @@ ABaseWeapon::ABaseWeapon()
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	check(SkeletalMeshComponent);
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
+	SkeletalMeshComponent->SetOnlyOwnerSee(true);
 	
 	SightsCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("SightsCamera"));
 	check(SightsCamera);
