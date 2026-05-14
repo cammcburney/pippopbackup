@@ -53,18 +53,7 @@ void AShooterPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	if (HasAuthority())
 	{
-		if (UWorld* World = GetWorld())
-		{
-			if (!PrimaryWeaponClass) {return;}
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.Instigator = this;
-			SpawnParameters.Owner = this;
-			if (ABaseWeapon* Weapon = World->SpawnActor<ABaseWeapon>(PrimaryWeaponClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
-			{
-				EquippedWeapon = Weapon;
-				EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Hand"));
-			}
-		}
+		PlayerEquipWeapon(0);
 	}
 	if (AppearanceComponent)
 	{
@@ -125,6 +114,10 @@ void AShooterPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AShooterPlayerCharacter::PlayerStopSprinting);
 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Started, this,  &AShooterPlayerCharacter::PlayerSlide);
 		EnhancedInputComponent->BindAction(SlideAction, ETriggerEvent::Completed, this,  &AShooterPlayerCharacter::PlayerStopSliding);
+		EnhancedInputComponent->BindAction(EquipPrimaryAction, ETriggerEvent::Started, this, &AShooterPlayerCharacter::PlayerEquipWeapon, 0);
+		EnhancedInputComponent->BindAction(EquipSecondaryAction, ETriggerEvent::Started, this, &AShooterPlayerCharacter::PlayerEquipWeapon, 1);
+		EnhancedInputComponent->BindAction(EquipSpecialAction, ETriggerEvent::Started, this, &AShooterPlayerCharacter::PlayerEquipWeapon, 2);
+		EnhancedInputComponent->BindAction(EquipTacticalAction, ETriggerEvent::Started, this, &AShooterPlayerCharacter::PlayerEquipWeapon, 3);
 	}
 }
 
@@ -232,6 +225,49 @@ void AShooterPlayerCharacter::PlayerChat()
 	{
 		PlayerController->FocusChat();
 	}
+}
+
+void AShooterPlayerCharacter::PlayerEquipWeapon(int32 WeaponIndex)
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+	if (CombatComponent)
+	{
+		FEquippedWeapons AvailableWeapons = CombatComponent->EquippedWeapons;
+		//fix later hehehe ;) move to combat gomponent :O
+		AvailableWeapons.PrimaryWeapon = PrimaryWeaponClass;
+		AvailableWeapons.SecondaryWeapon = SecondaryWeaponClass;
+		AvailableWeapons.SpecialWeapon = SpecialWeaponClass;
+		AvailableWeapons.TacticalWeapon = TacticalWeaponClass;
+		const EWeaponTypes WeaponType = static_cast<EWeaponTypes>(WeaponIndex);
+		TSubclassOf<ABaseWeapon> WeaponSubclass = nullptr;
+		switch (WeaponType)
+		{
+			case EWeaponTypes::PRIMARY:
+				WeaponSubclass = AvailableWeapons.PrimaryWeapon;
+				break;
+			case EWeaponTypes::SECONDARY:
+				WeaponSubclass = AvailableWeapons.SecondaryWeapon;
+				break;
+			case EWeaponTypes::SPECIAL:
+				WeaponSubclass = AvailableWeapons.SpecialWeapon;
+				break;
+			case EWeaponTypes::TACTICAL:
+				WeaponSubclass = AvailableWeapons.TacticalWeapon;
+				break;
+		}
+		if (WeaponSubclass)
+		{
+			if (ABaseWeapon* Weapon = CombatComponent->SpawnWeapon(WeaponSubclass, this))
+			{
+				EquippedWeapon = Weapon;
+				EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Hand"));
+			}
+		}
+	}
+	
 }
 
 void AShooterPlayerCharacter::PlayerAim()

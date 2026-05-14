@@ -26,9 +26,16 @@ public:
 	// Sets default values for this character's properties
 	AShooterPlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
+	// Delete later lol :)
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABaseWeapon> PrimaryWeaponClass;
-
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABaseWeapon> SecondaryWeaponClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABaseWeapon> SpecialWeaponClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABaseWeapon> TacticalWeaponClass;
+	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
 protected:
@@ -59,12 +66,25 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> SlideAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> EquipPrimaryAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> EquipSecondaryAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> EquipSpecialAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> EquipTacticalAction;
 	
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly)
 	TObjectPtr<UCombatComponent> CombatComponent;
 
 	UPROPERTY(EditAnywhere, Replicated, BlueprintReadOnly)
 	TObjectPtr<UAppearanceComponent> AppearanceComponent;
+	
 private:
 
 	UPROPERTY()
@@ -110,6 +130,9 @@ public:
 	UFUNCTION()
 	void PlayerChat();
 
+	UFUNCTION()
+	void PlayerEquipWeapon(int32 WeaponIndex);
+	
 	UFUNCTION()
 	void PlayerAim();
 
