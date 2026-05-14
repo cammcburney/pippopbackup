@@ -31,5 +31,5 @@ public:
 	
 	virtual void Interact_Implementation(UPrimitiveComponent* InteractedComponent) override;
 
-	virtual void PlaySoundEffect(const FSoundEffect PlayedSoundEffect);
+	virtual UAudioComponent* PlaySoundEffect(const FSoundEffect PlayedSoundEffect);
 };

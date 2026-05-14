@@ -24,10 +24,8 @@ void ASwitcherBase::Interact_Implementation(UPrimitiveComponent* InteractedCompo
 	PlaySoundEffect(InteractSoundEffect);
 }
 
-void ASwitcherBase::PlaySoundEffect(const FSoundEffect PlayedSoundEffect)
+UAudioComponent* ASwitcherBase::PlaySoundEffect(const FSoundEffect PlayedSoundEffect)
 {
-	if (PlayedSoundEffect.Sound)
-	{
-		UGameplayStatics::PlaySound2D(this, PlayedSoundEffect.Sound, PlayedSoundEffect.Volume, PlayedSoundEffect.Pitch, PlayedSoundEffect.StartTime);
-	}
+	if (!PlayedSoundEffect.Sound) {return nullptr;}
+	return UGameplayStatics::SpawnSoundAtLocation(this,PlayedSoundEffect.Sound, GetActorLocation(), FRotator::ZeroRotator, PlayedSoundEffect.Volume, PlayedSoundEffect.Pitch, PlayedSoundEffect.StartTime);
 }
