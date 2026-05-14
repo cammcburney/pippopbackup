@@ -30,28 +30,24 @@ void UPipPopMovementComponent::TraceForWalls()
 		FCollisionQueryParams TraceParams = FCollisionQueryParams();
 		TraceParams.bTraceComplex = true;
 		TraceParams.bReturnPhysicalMaterial = false;
-		FHitResult TraceHit(ForceInit);
-		GetWorld()->LineTraceSingleByChannel(
-			TraceHit,
+		TArray<FHitResult> HitResults;
+		FCollisionShape ColShape = FCollisionShape::MakeSphere(TraceRadius);
+		GetWorld()->SweepMultiByChannel(
+			HitResults,
 			Start,
 			End,
+			FQuat::Identity,
 			ECC_WALLJUMP,
+			ColShape,
 			TraceParams
 		);
-		DrawDebugLine(
-		GetWorld(),
-		Start,
-		End,
-		FColor(255, 0, 0),
-		false, -1, 0,
-		12.333
-		);
-		if (TraceHit.bBlockingHit)
+		for (const auto& TraceHit : HitResults)
 		{
-			SetCanWallJump(true);
-		}
-		else
-		{
+			if (TraceHit.bBlockingHit)
+			{
+				SetCanWallJump(true);
+				break;
+			}
 			SetCanWallJump(false);
 		}
 	}
@@ -91,7 +87,6 @@ void UPipPopMovementComponent::SetSprinting(bool Sprint)
 void UPipPopMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("Movement Mode: %s"), *GetMovementName()));
 	if (PreviousMovementMode == MOVE_Falling)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TraceHandle);
@@ -156,7 +151,6 @@ FVector UPipPopMovementComponent::NewFallVelocity(const FVector& InitialVelocity
 	GetPhysicsVolume()->TerminalVelocity = MaxTerminalVelocity;
 	const FVector ScaledGravity = Gravity * (FallTime * GravityScaleMultiplier);
 	FVector FallVelocity = Super::NewFallVelocity(InitialVelocity, ScaledGravity, DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, FString::Printf(TEXT("FALL TIME: %.2f | Velocity %.2f, | Terminal %.2f"), FallTime, FallVelocity.Z, -MaxTerminalVelocity));
 	FallVelocity.Z = FMath::Max(FallVelocity.Z, -MaxTerminalVelocity);
 	return FallVelocity;
 	

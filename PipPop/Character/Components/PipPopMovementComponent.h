@@ -46,6 +46,9 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float MaxSprintSpeed = 1500.f;
 
+	UPROPERTY(EditAnywhere, Category = "Trace")
+	float TraceRadius = 50.f;
+	
 	virtual float GetMaxSpeed() const override;
 	
 	UPROPERTY(EditDefaultsOnly)
