@@ -28,6 +28,7 @@ UCLASS()
 class PIPPOP_API ACustomisationPawn : public APawn
 {
 	GENERATED_BODY()
+	
 public:
 	
 	UPROPERTY(EditDefaultsOnly)

@@ -17,7 +17,6 @@ ACustomisationPawn::ACustomisationPawn()
 	PrimaryActorTick.bCanEverTick = true;
 	AppearanceComponent = CreateDefaultSubobject<UAppearanceComponent>("AppearanceComponent");
 	check(AppearanceComponent);
-	
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
 	check(SpringArm);
 	SpringArm->SetupAttachment(RootComponent);
@@ -47,7 +46,6 @@ void ACustomisationPawn::BeginPlay()
 void ACustomisationPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
 }
 
 // Called to bind functionality to input
