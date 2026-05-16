@@ -116,7 +116,7 @@ void ABulletProjectile::ProjectileHit(UPrimitiveComponent* HitComponent, AActor*
 	
 }
 
-void ABulletProjectile::TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory)
+void ABulletProjectile::TriggerNiagaraSystem_Implementation(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory)
 {
 }
 

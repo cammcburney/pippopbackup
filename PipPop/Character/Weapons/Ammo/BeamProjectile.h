@@ -26,7 +26,7 @@ public:
 	
 	FTimerHandle BeamTimer;
 
-	virtual void TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory) override;
+	virtual void TriggerNiagaraSystem_Implementation(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory) override;
 
 	virtual void DestroyParticle() override;
 	

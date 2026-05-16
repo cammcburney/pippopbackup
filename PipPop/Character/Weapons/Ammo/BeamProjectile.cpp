@@ -6,23 +6,29 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
-void ABeamProjectile::TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory)
+void ABeamProjectile::TriggerNiagaraSystem_Implementation(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory)
 {
 	if (OwningWeapon)
 	{
 		if (USkeletalMeshComponent* OwningWeaponMesh = OwningWeapon->SkeletalMeshComponent)
 		{
-			NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
-				ProjectileNiagaraSystem,
-				OwningWeaponMesh,
-				"Muzzle",
-				BulletTrajectory.Start,
-				BulletTrajectory.ShotDirection,
-				EAttachLocation::Type::KeepRelativeOffset,
-				true);
-			NiagaraComponent->SetVectorParameter(FName("BeamStart"), BulletTrajectory.Start);
-			NiagaraComponent->SetVectorParameter(FName("BeamEnd"), ProjectileMeshComponent->GetComponentLocation());
-			GetWorld()->GetTimerManager().SetTimer(BeamTimer, this, &ABeamProjectile::UpdateBeam, 0.01f, true);
+			if (ProjectileNiagaraSystem)
+			{
+				NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+					ProjectileNiagaraSystem,
+					OwningWeaponMesh,
+					"Muzzle",
+					BulletTrajectory.Start,
+					BulletTrajectory.ShotDirection,
+					EAttachLocation::Type::KeepRelativeOffset,
+					true);
+				if (NiagaraComponent && ProjectileMeshComponent)
+				{
+					NiagaraComponent->SetVectorParameter(FName("BeamStart"), BulletTrajectory.Start);
+					NiagaraComponent->SetVectorParameter(FName("BeamEnd"), ProjectileMeshComponent->GetComponentLocation());
+				}
+				GetWorld()->GetTimerManager().SetTimer(BeamTimer, this, &ABeamProjectile::UpdateBeam, 0.01f, true);
+			}
 		}
 	}
 }

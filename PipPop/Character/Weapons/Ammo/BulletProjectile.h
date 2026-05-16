@@ -86,14 +86,16 @@ public:
 	UFUNCTION()
 	virtual void ProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast, Reliable)
 	virtual void TriggerNiagaraSystem(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory);
+	virtual void TriggerNiagaraSystem_Implementation(ABaseWeapon* OwningWeapon, FBulletTrajectory BulletTrajectory);
 
 	UFUNCTION()
 	virtual void SpawnBulletSound();
 
 	UFUNCTION()
 	virtual void DestroyProjectile();
+	
 protected:
 	
 	virtual void BeginPlay() override;
