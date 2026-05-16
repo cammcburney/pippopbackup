@@ -14,6 +14,7 @@ UPipPopMovementComponent::UPipPopMovementComponent()
 	// Check if this breaks things
 	bRequestingSprint = false;
 	bCanWallJump = false;
+	bUseControllerDesiredRotation = true;
 }
 
 void UPipPopMovementComponent::SetCanWallJump(bool bWallJumpState)
