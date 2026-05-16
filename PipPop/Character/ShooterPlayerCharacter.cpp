@@ -25,7 +25,7 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	bReplicates = true;
 	SetReplicates(true);
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCameraComponent"));
 	check(FirstPersonCameraComponent);
@@ -70,21 +70,21 @@ void AShooterPlayerCharacter::BeginPlay()
 void AShooterPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (!GravityCenter.IsNearlyZero())
-	{
-		if (UPipPopMovementComponent* MovementComponent = Cast<UPipPopMovementComponent>(GetCharacterMovement()))
-		{
-			// FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), GravityCenter);
-			// MovementComponent->SetGravityDirection(LookRotation.Vector());
-			const FVector GravityDirection = -(GetActorLocation() - GravityCenter).GetSafeNormal();
-			MovementComponent->SetGravityDirection(GravityDirection);
-			
-			FVector ProjectedForward = FVector::VectorPlaneProject(GetActorForwardVector(), -GravityDirection).GetSafeNormal();
-			FQuat TargetRotation = FRotationMatrix::MakeFromXZ(-GravityDirection, ProjectedForward).ToQuat();
-			FQuat FinalRotation = FQuat::Slerp(GetActorQuat(), TargetRotation, FMath::Clamp(DeltaTime * 8.f, 0.f, 1.f));
-			SetActorRotation(FinalRotation);
-		}
-	}
+	// if (!GravityCenter.IsNearlyZero())
+	// {
+	// 	if (UPipPopMovementComponent* MovementComponent = Cast<UPipPopMovementComponent>(GetCharacterMovement()))
+	// 	{
+	// 		// FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), GravityCenter);
+	// 		// MovementComponent->SetGravityDirection(LookRotation.Vector());
+	// 		const FVector GravityDirection = -(GetActorLocation() - GravityCenter).GetSafeNormal();
+	// 		MovementComponent->SetGravityDirection(GravityDirection);
+	// 		
+	// 		FVector ProjectedForward = FVector::VectorPlaneProject(GetActorForwardVector(), -GravityDirection).GetSafeNormal();
+	// 		FQuat TargetRotation = FRotationMatrix::MakeFromXZ(-GravityDirection, ProjectedForward).ToQuat();
+	// 		FQuat FinalRotation = FQuat::Slerp(GetActorQuat(), TargetRotation, FMath::Clamp(DeltaTime * 8.f, 0.f, 1.f));
+	// 		SetActorRotation(FinalRotation);
+	// 	}
+	// }
 }
 
 void AShooterPlayerCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -275,7 +275,6 @@ bool AShooterPlayerCharacter::PlayerEquipWeapon_Validate(int32 WeaponIndex)
 void AShooterPlayerCharacter::PlayerAim()
 {
 	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = true;
 	if (FirstPersonCameraComponent)
 	{
@@ -291,7 +290,6 @@ void AShooterPlayerCharacter::PlayerAim()
 void AShooterPlayerCharacter::PlayerStopAiming()
 {
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 	if (FirstPersonCameraComponent)
 	{

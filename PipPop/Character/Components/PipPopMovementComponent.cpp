@@ -14,7 +14,7 @@ UPipPopMovementComponent::UPipPopMovementComponent()
 	// Check if this breaks things
 	bRequestingSprint = false;
 	bCanWallJump = false;
-	bUseControllerDesiredRotation = true;
+	bUseControllerDesiredRotation = false;
 }
 
 void UPipPopMovementComponent::SetCanWallJump(bool bWallJumpState)
@@ -42,6 +42,7 @@ void UPipPopMovementComponent::TraceForWalls()
 			ColShape,
 			TraceParams
 		);
+		SetCanWallJump(false);
 		for (const auto& TraceHit : HitResults)
 		{
 			if (TraceHit.bBlockingHit)
@@ -49,7 +50,6 @@ void UPipPopMovementComponent::TraceForWalls()
 				SetCanWallJump(true);
 				break;
 			}
-			SetCanWallJump(false);
 		}
 	}
 }
@@ -69,7 +69,7 @@ void UPipPopMovementComponent::WallJump_Implementation()
 	{
 		if (AShooterPlayerCharacter* PlayerCharacter = Cast<AShooterPlayerCharacter>(GetOwner()))
 		{
-			PlayerCharacter->LaunchCharacter(FVector(PlayerCharacter->GetActorForwardVector().X * (WallJumpForce * 100), 0.f, JumpZVelocity), true, true);
+			PlayerCharacter->LaunchCharacter(FVector(PlayerCharacter->GetActorForwardVector().Normalize() * (WallJumpForce * 100), 0.f, JumpZVelocity), true, true);
 			CurrentWallJumps += 1;
 		}
 	}
