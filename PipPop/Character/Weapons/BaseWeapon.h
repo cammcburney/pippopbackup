@@ -71,6 +71,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float AimingSpreadReduction = .7f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float StarPowerCost = 3.f;
 	
 private:
 
@@ -117,6 +120,10 @@ public:
 	virtual void Fire_Implementation();
 	virtual bool Fire_Validate();
 
-	void FireProjectile();
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void FireProjectile();
+	virtual void FireProjectile_Implementation();
+	virtual bool FireProjectile_Validate();
+	
 	
 };

@@ -113,19 +113,16 @@ bool ABaseWeapon::Fire_Validate()
 
 FBulletTrajectory ABaseWeapon::CalculateBulletTrajectory(const FVector& Location, const FRotator& Rotation)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("bIsAiming %s"), bIsAiming ? TEXT("true") : TEXT("false")));
-	FRotator SocketRotation = SkeletalMeshComponent->GetSocketRotation("Muzzle");
-	FRotator SpreadRotation = SocketRotation;
+	FRotator SpreadRotation = Rotation;
 	float SpreadMultiplier = bIsAiming ? AimingSpreadReduction : 1.f;
 	SpreadRotation.Pitch += FMath::RandRange(-SpreadAngles.DownAngle, SpreadAngles.UpAngle) * SpreadMultiplier; 
 	SpreadRotation.Yaw += FMath::RandRange(-SpreadAngles.LeftAngle, SpreadAngles.RightAngle) * SpreadMultiplier; 
 	const FVector MuzzleLocation = SkeletalMeshComponent->GetSocketLocation("Muzzle");
 	const FRotator SpreadRotator = SpreadRotation.GetEquivalentRotator();
-	const  FRotator ShotDirection = SpreadRotator;
-	return FBulletTrajectory{ ShotDirection, MuzzleLocation };
+	return FBulletTrajectory{ SpreadRotator, MuzzleLocation };
 }
 
-void ABaseWeapon::FireProjectile()
+void ABaseWeapon::FireProjectile_Implementation()
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -141,7 +138,11 @@ void ABaseWeapon::FireProjectile()
 		{
 			Bullet->TriggerNiagaraSystem(this, BulletTrajectory);
 		}
-		
 	}
+}
+
+bool ABaseWeapon::FireProjectile_Validate()
+{
+	return true;
 }
 
