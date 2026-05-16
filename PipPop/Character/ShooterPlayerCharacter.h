@@ -38,6 +38,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	TObjectPtr<UCameraComponent> FirstPersonCameraComponent;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -87,9 +88,6 @@ protected:
 	
 private:
 
-	UPROPERTY()
-	TObjectPtr<ABaseWeapon> PrimaryWeapon;
-
 	UPROPERTY(Replicated)
 	TObjectPtr<ABaseWeapon> EquippedWeapon;
 
@@ -130,8 +128,10 @@ public:
 	UFUNCTION()
 	void PlayerChat();
 
-	UFUNCTION()
-	void PlayerEquipWeapon(int32 WeaponIndex);
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void PlayerEquipWeapon(int32 WeaponIndex);
+	virtual void PlayerEquipWeapon_Implementation(int32 WeaponIndex);
+	virtual bool PlayerEquipWeapon_Validate(int32 WeaponIndex);
 	
 	UFUNCTION()
 	void PlayerAim();

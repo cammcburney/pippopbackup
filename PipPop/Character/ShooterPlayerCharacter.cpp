@@ -24,9 +24,9 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	SetReplicates(true);
-	bUseControllerRotationPitch = true;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = true;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCameraComponent"));
 	check(FirstPersonCameraComponent);
 	FirstPersonCameraComponent->SetupAttachment(GetMesh());
@@ -40,8 +40,6 @@ AShooterPlayerCharacter::AShooterPlayerCharacter(const FObjectInitializer& Objec
 	check(CombatComponent);
 	AppearanceComponent = CreateDefaultSubobject<UAppearanceComponent>(TEXT("AppearanceComponent"));
 	check(AppearanceComponent);
-	PrimaryWeapon = CreateDefaultSubobject<ABaseWeapon>(TEXT("PrimaryWeaponClass"));
-	check(PrimaryWeapon)
 	GetCharacterMovement()->JumpZVelocity = 850.f;
 	GetCharacterMovement()->GravityScale = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 1200.f;
@@ -227,7 +225,7 @@ void AShooterPlayerCharacter::PlayerChat()
 	}
 }
 
-void AShooterPlayerCharacter::PlayerEquipWeapon(int32 WeaponIndex)
+void AShooterPlayerCharacter::PlayerEquipWeapon_Implementation(int32 WeaponIndex)
 {
 	if (EquippedWeapon)
 	{
@@ -267,11 +265,18 @@ void AShooterPlayerCharacter::PlayerEquipWeapon(int32 WeaponIndex)
 			}
 		}
 	}
-	
+}
+
+bool AShooterPlayerCharacter::PlayerEquipWeapon_Validate(int32 WeaponIndex)
+{
+	return true;
 }
 
 void AShooterPlayerCharacter::PlayerAim()
 {
+	bUseControllerRotationPitch = true;
+	bUseControllerRotationYaw = true;
+	bUseControllerRotationRoll = true;
 	if (FirstPersonCameraComponent)
 	{
 		FirstPersonCameraComponent->Deactivate();
@@ -285,6 +290,9 @@ void AShooterPlayerCharacter::PlayerAim()
 
 void AShooterPlayerCharacter::PlayerStopAiming()
 {
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 	if (FirstPersonCameraComponent)
 	{
 		FirstPersonCameraComponent->Activate();
